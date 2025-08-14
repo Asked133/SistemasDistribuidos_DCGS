@@ -54,17 +54,21 @@ public class Peer
         {
             var stream = _tcpClient?.GetStream();
             var reader = new StreamReader(stream, Encoding.UTF8);
-            var message = await reader.ReadLineAsync();
-            Console.WriteLine($"Peer message: {message}");
+            while (true)
+            {
+                var message = await reader.ReadLineAsync();
+                if (message == null || message.ToLower() == "exit")
+                {
+                    break;
+                }
+                Console.WriteLine($"Peer message: {message}");
+            }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error receiving message: {ex.Message}");
         }
-        finally
-        {
-            Close();
-        }
+
     }
 
     public async Task SendMessage()
@@ -73,8 +77,16 @@ public class Peer
         {
             var stream = _tcpClient?.GetStream();
             var writer = new StreamWriter(stream, Encoding.UTF8) { AutoFlush = true };
-            var message = "Hola :D este es mi primer mensaje";
-            await writer.WriteLineAsync(message);
+            while (true)
+            {
+                var message = Console.ReadLine();
+                if (message == null || message.ToLower() == "exit")
+                {
+                    await writer.WriteLineAsync("exit");
+                    break;
+                }
+                await writer.WriteLineAsync(message);
+            }
         }
         catch (Exception ex)
         {

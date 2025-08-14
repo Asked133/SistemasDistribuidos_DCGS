@@ -8,5 +8,9 @@ class Program
         {
             await peer.ConnectToPeer(args[1], args[2]);
         }
+         else
+        {
+            await peer.StartListening();
+        }
     }
 }
