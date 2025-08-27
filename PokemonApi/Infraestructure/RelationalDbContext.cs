@@ -1,0 +1,29 @@
+using Microsoft.EntityFrameworkCore;
+using PokemonApi.Infraestructure.Entities;
+
+namespace PokemonApi.Infraestructure;
+
+public class RelationalDBContext : DbContext
+{
+    public DbSet<PokemonEntity> Pokemons { get; set; }
+    public RelationalDBContext(DbContextOptions<RelationalDBContext> db) : base(db)
+    {
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<PokemonEntity>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Type).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Level).IsRequired();
+            entity.Property(e => e.Attack).IsRequired();
+            entity.Property(e => e.Defense).IsRequired();
+            entity.Property(e => e.Speed).IsRequired();
+            entity.Property(e => e.HP).IsRequired();
+        });
+    }
+}
