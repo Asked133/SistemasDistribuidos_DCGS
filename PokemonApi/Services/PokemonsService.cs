@@ -1,12 +1,35 @@
+using System.ServiceModel;
 using PokemonApi.Dtos;
+using PokemonApi.Repositories;
+using PokemonApi.Mappers;
+using PokemonApi.Validators;
 
-namespace PokemonApi.Services
+namespace PokemonApi.Services;
+
+public class PokemonService : IPokemonService
 {
-    public class PokemonService : IPokemonService
+    private readonly IPokemonRepository _pokemonRepository;
+    public PokemonService(IPokemonRepository pokemonRepository)
     {
-        public Task<PokemonResponseDto> CreatePokemon(CreatePokemonDto pokemon, CancellationToken cancel)
+        _pokemonRepository = pokemonRepository;
+    }
+    public async Task<PokemonResponseDto> CreatePokemon(CreatePokemonDto pokemonRequest, CancellationToken cancellationToken)
+    {
+        pokemonRequest.ValidateName().ValidateLevel().ValidateType();
+        if (await PokemonAlreadyExists(pokemonRequest.Name, cancellationToken))
         {
-            throw new NotImplementedException();
+            throw new FaultException("Pokemon already exists");
         }
+
+        var pokemon = await _pokemonRepository.CreateAsync(pokemonRequest.ToModel(), cancellationToken);
+
+
+        return pokemon.ToResponseDto();
+    }
+
+    private async Task<bool> PokemonAlreadyExists(string name, CancellationToken cancellationToken)
+    {
+        var pokemons = await _pokemonRepository.GetByNameAsync(name, cancellationToken);
+        return pokemons is not null;
     }
 }
