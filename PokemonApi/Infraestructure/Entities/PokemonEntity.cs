@@ -1,4 +1,4 @@
-namespace PokemonApi.Infraestructure.Entities;
+namespace PokemonApi.Infrastructure.Entities;
 
 public class PokemonEntity
 {
