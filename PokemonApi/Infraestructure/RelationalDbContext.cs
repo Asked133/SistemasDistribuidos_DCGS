@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using PokemonApi.Infraestructure.Entities;
+using PokemonApi.Infrastructure.Entities;
 
-namespace PokemonApi.Infraestructure;
+namespace PokemonApi.Infrastructure;
 
 public class RelationalDBContext : DbContext
 {

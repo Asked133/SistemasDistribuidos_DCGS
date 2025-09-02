@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.StaticAssets;
 using PokemonApi.Dtos;
-using PokemonApi.Infraestructure.Entities;
+using PokemonApi.Infrastructure.Entities;
 using PokemonApi.Models;
 
 namespace PokemonApi.Mappers;
@@ -75,5 +75,14 @@ public static class PokemonMapper
                 Defense = requestPokemonDto.Stats.Defense
             }
         };
+    }
+    public static IList<PokemonResponseDto> ToResponseDto(this IReadOnlyList<Pokemon> pokemons)
+    {
+        return pokemons.Select(s => s.ToResponseDto()).ToList();
+    }
+
+    public static IReadOnlyList<Pokemon> ToModel(this IReadOnlyList<PokemonEntity> pokemons)
+    {
+        return pokemons.Select(s => s.ToModel()).ToList();
     }
 }
