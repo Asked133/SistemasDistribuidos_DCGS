@@ -1,0 +1,6 @@
+@MobsApi_HostAddress = http://localhost:5188
+
+GET {{MobsApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
