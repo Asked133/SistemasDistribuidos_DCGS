@@ -13,7 +13,20 @@ public class PokemonRepository : IPokemonRepository
     {
         _context = context;
 
-    }   
+    }
+
+    public async Task UpdatePokemonAsync(Pokemon pokemon, CancellationToken cancellationToken)
+    {
+        _context.Pokemons.Update(pokemon.ToEntity());
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task DeletePokemonAsync(Pokemon pokemon, CancellationToken cancellationToken)
+    {
+        // Delete   * from Pokemons where Id = pokemon.Id
+        _context.Pokemons.Remove(pokemon.ToEntity());
+        await _context.SaveChangesAsync(cancellationToken);
+    }
 
     public async Task<IReadOnlyList<Pokemon>> GetPokemonsByNameAsync(string name, CancellationToken cancellationToken)
     {
