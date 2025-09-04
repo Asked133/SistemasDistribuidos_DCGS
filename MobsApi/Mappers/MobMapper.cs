@@ -7,7 +7,6 @@ namespace MobApi.Mappers;
 
 public static class MobMapper
 {
-    //extension method
     public static Mob ToModel(this MobEntity mobEntity)
     {
         if (mobEntity is null)

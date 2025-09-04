@@ -8,4 +8,9 @@ public interface IMobService
 {
     [OperationContract]
     Task<MobResponseDto> CreateMob(CreateMobDto mob, CancellationToken cancellationToken);
+    [OperationContract]
+    Task<MobResponseDto> GetMobById(Guid mobId, CancellationToken cancellationToken);
+
+    [OperationContract]
+    Task<DeleteMobResponseDto> DeleteMob(Guid id, CancellationToken cancellationToken);
 }
