@@ -1,5 +1,8 @@
 # API SOAP de Personajes de Diablo IV
 
+# Si quiere ver el pullrequest siga el siguiente link
+https://github.com/Asked133/SistemasDistribuidos_DCGS/pull/16
+
 ## Prerequisitos
 
 Antes de comenzar, asegúrate de tener instalado el siguiente software en tu sistema:
@@ -65,3 +68,4 @@ python -m podman_compose down -v
 (PATH)
 
 podman-compose down -v
+
