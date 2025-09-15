@@ -1,6 +1,6 @@
-#API SOAP de Personajes de Diablo IV
+# API SOAP de Personajes de Diablo IV
 
-##Prerequisitos
+## Prerequisitos
 
 Antes de comenzar, asegúrate de tener instalado el siguiente software en tu sistema:
 
@@ -12,48 +12,56 @@ Un cliente SOAP: Una herramienta como Insomnia para enviar peticiones al servici
 
 (Opcional)Github CLI: Para que sea mas sencillo clonar el pull request
 
-##Levantar el proyecto
+## Levantar el proyecto
 
-###Primero hay que clonar el repositorio
+### Primero hay que clonar el repositorio
 git clone https://github.com/Asked133/SistemasDistribuidos_DCGS
+
 cd SistemasDistrbuidos_DCGS
 
-###Descarga la PR
+### Descarga la PR
 gh pr checkout 16
 
-###Opcion B: Sin Descargar gh   (pr-16 puede ser cambiado por otro nombre para mejor entendimiento)
+### Opcion B: Sin Descargar gh   (pr-16 puede ser cambiado por otro nombre para mejor entendimiento)
 git fetch origin pull/16/head:pr-16
+
 git checkout pr-16
 
-##Se levantan los contenedores estando en la raiz del proyecto (DiabloApi/)
-###Docker
+## Se levantan los contenedores estando en la raiz del proyecto (DiabloApi/)
+### Docker
 docker-compose up --build -d
 
-###Podman   (Si tienes podman compose como PATH es otro comando)
+### Podman   (Si tienes podman compose como PATH es otro comando)
 python -m podman_compose up --build -d
+
 (PATH)
+
 podman-compose up --build -d
 
-##Abra Insomnia e importe el contrato http://localhost:8055/ws/characters.wsdl
+## Abra Insomnia e importe el contrato http://localhost:8055/ws/characters.wsdl
 
-##Elija la operacion que requiera y llene los campos
+## Elija la operacion que requiera y llene los campos
 
-##Si termino de usar la API use
+## Si termino de usar la API use
 
-###Docker
+### Docker
 docker-compose down
 
-###Podman
+### Podman
 python -m podman_compose down
+
 (PATH)
+
 podman_compose down
 
-##Si quiere eliminar los volumenes es
+## Si quiere eliminar los volumenes es
 
-###Docker
+### Docker
 docker-compose down -v
 
-###Podman
+### Podman
 python -m podman_compose down -v
+
 (PATH)
+
 podman-compose down -v
