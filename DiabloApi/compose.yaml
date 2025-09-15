@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  # Base de datos MySQL
+  diablo-mysql:
+    image: 'mysql:8.0'
+    container_name: diablo-mysql
+    environment:
+      - 'MYSQL_DATABASE=diablo_db'
+      - 'MYSQL_PASSWORD=secret'
+      - 'MYSQL_ROOT_PASSWORD=verysecret'
+      - 'MYSQL_USER=myuser'
+    ports:
+      - '3366:3306'
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - diablo-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # Aplicación DiabloApi
+  diablo-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: diablo-api:1
+    container_name: diablo-api
+    ports:
+      - '8055:8055'
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:mysql://diablo-mysql:3306/diablo_db
+      - SPRING_DATASOURCE_USERNAME=myuser
+      - SPRING_DATASOURCE_PASSWORD=secret
+      - SERVER_PORT=8055
+    depends_on:
+      - diablo-mysql
+    networks:
+      - diablo-network
+    restart: unless-stopped
+    volumes:
+      - app-logs:/app/logs
+
+volumes:
+  mysql-data:
+    driver: local
+  app-logs:
+    driver: local
+
+networks:
+  diablo-network:
+    driver: bridge
