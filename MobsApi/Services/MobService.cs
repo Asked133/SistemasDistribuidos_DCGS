@@ -15,6 +15,45 @@ public class MobService : IMobService
         _mobRepository = mobRepository;
     }
 
+    public async Task<IList<MobResponseDto>> GetMobsByName(string name, CancellationToken cancellationToken)
+    {
+        var mobs = await _mobRepository.GetMobsByNameAsync(name, cancellationToken);
+        return mobs.ToResponseDto();
+    }
+
+      public async Task<MobResponseDto> UpdateMob(UpdateMobDto mobToUpdate, CancellationToken cancellationToken)
+    {
+        var mob = await _mobRepository.GetByIdAsync(mobToUpdate.Id, cancellationToken);
+        if (!MobExists(mob))
+        {
+            throw new FaultException(reason: "Mob not found");
+        }
+
+        if (!await IsMobAllowedToBeUpdated(mobToUpdate, cancellationToken))
+        {
+            throw new FaultException("Another mob with the same name already exists");
+        }
+
+        mob.Name = mobToUpdate.Name;
+        mob.Type = mobToUpdate.Type;
+        mob.Stats.Attack = mobToUpdate.Stats.Attack;
+        mob.Stats.Speed = mobToUpdate.Stats.Speed;
+
+        await _mobRepository.UpdateMobAsync(mob, cancellationToken);
+        return mob.ToResponseDto();
+    }
+
+    private async Task<bool> IsMobAllowedToBeUpdated(UpdateMobDto mobToUpdate, CancellationToken cancellationToken)
+    {
+        var duplicatedMob = await _mobRepository.GetByNameAsync(mobToUpdate.Name, cancellationToken);
+        return duplicatedMob is null || !IsTheSameMob(duplicatedMob, mobToUpdate);
+    }
+
+    private bool IsTheSameMob(Mob mob, UpdateMobDto mobToUpdate)
+    {
+        return mob.Id != mobToUpdate.Id;
+    }
+
     public async Task<DeleteMobResponseDto> DeleteMob(Guid id, CancellationToken cancellationToken)
     {
         var mob = await _mobRepository.GetByIdAsync(id, cancellationToken);

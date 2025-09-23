@@ -75,4 +75,13 @@ public static class MobMapper
             }
         };
     }
+    public static IList<MobResponseDto> ToResponseDto(this IReadOnlyList<Mob> mobs)
+    {
+        return mobs.Select(s => s.ToResponseDto()).ToList();
+    }
+
+    public static IReadOnlyList<Mob> ToModel(this IReadOnlyList<MobEntity> mobs)
+    {
+        return mobs.Select(s => s.ToModel()).ToList();
+    }
 }

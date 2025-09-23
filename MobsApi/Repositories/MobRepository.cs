@@ -15,6 +15,19 @@ public class MobRepository : IMobRepository
 
     }
 
+    public async Task<IReadOnlyList<Mob>> GetMobsByNameAsync(string name, CancellationToken cancellationToken)
+    {
+        var mobs = await _context.Mobs.AsNoTracking().Where(s => s.Name.Contains(name)).ToListAsync(cancellationToken);
+        return mobs.ToModel();
+    }
+
+
+    public async Task UpdateMobAsync(Mob mob, CancellationToken cancellationToken)
+    {
+        _context.Mobs.Update(mob.ToEntity());
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+
     public async Task DeleteMobAsync(Mob mob, CancellationToken cancellationToken)
     {
         // Delete   * from Mobs where Id = mob.Id
