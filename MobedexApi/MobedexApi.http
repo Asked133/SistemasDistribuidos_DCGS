@@ -1,0 +1,6 @@
+@MobedexApi_HostAddress = http://localhost:5248
+
+GET {{MobedexApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
