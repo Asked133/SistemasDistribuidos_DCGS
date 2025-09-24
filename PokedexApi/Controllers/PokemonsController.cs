@@ -23,13 +23,25 @@ public class PokemonsController : ControllerBase
     // 500 Internal Server Error (Error del servidor)
 
     //Http Verb -Get
-     [HttpGet("{id}", Name = "GetPokemonByIdAsync")]
+    [HttpGet("{id}", Name = "GetPokemonByIdAsync")]
     public async Task<ActionResult<PokemonResponse>> GetPokemonByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         var pokemon = await _pokemonService.GetPokemonByIdAsync(id, cancellationToken);
         return pokemon is null ? NotFound() : Ok(pokemon.ToResponse());
     }
 
+    [HttpGet]
+    public async Task<ActionResult<IList<PokemonResponse>>> GetPokemonsByNameAsync([FromQuery] string name, [FromQuery] string type, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrEmpty(name) && string.IsNullOrEmpty(type))
+        {
+            return BadRequest(new { Message = "At least one query parameter (name or type) must be provided." });
+
+        }
+
+        var pokemons = await _pokemonService.GetPokemonsAsync(name, type, cancellationToken);
+        return Ok(pokemons.ToResponse());
+    }
     //Http Verb - Post
     //Http Status
     // 400 Bad Request (Si usuario manda informacion erronea)
@@ -61,6 +73,30 @@ public class PokemonsController : ControllerBase
             return Conflict(new { Message = e.Message });
         }
     }
+
+
+    //LocalHost:Port/api/v1/pokemons/ID
+    //Http Verb - Delete
+    //Http Status
+    // 200 OK (Si borro) No sigue muy bien el RESTFUL
+    // 204 No Content (Si se borro correctamente)
+    // 404 Not Found (Si el pokemon no existe)
+    // 500 Internal Server Error (Error del servidor)
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> DeletePokemonAsync(Guid id, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _pokemonService.DeletePokemonAsync(id, cancellationToken);
+            return NoContent(); // 204 No Content
+        }
+        catch (PokemonNotFoundException)
+        {
+            return NotFound(); // 404 Not Found 
+        }
+    }
+
     private static bool IsValidAttack(CreatePokemonRequest createPokemon)
     {
         return createPokemon.Stats.Attack > 0;

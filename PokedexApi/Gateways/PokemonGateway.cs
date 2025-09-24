@@ -18,6 +18,19 @@ public class PokemonGateway : IPokemonGateway
         _pokemonContract = new ChannelFactory<IPokemonContract>(binding, endpoint).CreateChannel();
         _logger = logger;
     }
+
+    public async Task DeletePokemonAsync(Guid id, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _pokemonContract.DeletePokemon(id, cancellationToken);
+        }
+        catch (FaultException ex) when (ex.Message == "Pokemon not found")
+        {
+            _logger.LogWarning(ex, "Pokemon not found.");
+            throw new PokemonNotFoundException(id);
+        }
+    }
     public async Task<Pokemon> GetPokemonByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         try

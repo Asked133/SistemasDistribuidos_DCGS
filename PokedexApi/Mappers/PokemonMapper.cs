@@ -1,4 +1,4 @@
-using System.CodeDom;
+
 using PokedexApi.Dtos;
 using PokedexApi.Infrastructure.Soap.Dtos;
 using PokedexApi.Models;
@@ -35,6 +35,7 @@ public static class PokemonMapper
         {
             Id = pokemon.Id,
             Name = pokemon.Name,
+            Type = pokemon.Type,
             Attack = pokemon.Stats.Attack
         };
     }
@@ -69,5 +70,10 @@ public static class PokemonMapper
                 HP = pokemon.Stats.HP
             }
         };
+    }
+
+    public static IList<PokemonResponse> ToResponse(this IList<Pokemon> pokemons)
+    {
+        return pokemons.Select(s => s.ToResponse()).ToList();
     }
 }
