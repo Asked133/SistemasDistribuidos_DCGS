@@ -13,15 +13,27 @@ public class PokemonService : IPokemonService
         _pokemonGateway = pokemonGateway;
     }
 
+    public async Task DeletePokemonAsync(Guid id, CancellationToken cancellationToken)
+    {
+        await _pokemonGateway.DeletePokemonAsync(id, cancellationToken);
+    }
+
     public async Task<Pokemon> GetPokemonByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         return await _pokemonGateway.GetPokemonByIdAsync(id, cancellationToken);
     }
-    public async Task<Pokemon> CreatePokemonAsync(Pokemon pokemon, CancellationToken cancellationToken)
+
+   public async Task<IList<Pokemon>> GetPokemonsAsync(string name, string type, CancellationToken cancellationToken)
+{
+    var pokemons = await _pokemonGateway.GetPokemonsByNameAsync(name, cancellationToken);
+    return pokemons.Where(s => s.Type.ToLower().Contains(type.ToLower())).ToList();
+}
+
+public async Task<Pokemon> CreatePokemonAsync(Pokemon pokemon, CancellationToken cancellationToken)
+{
+    var pokemons = await _pokemonGateway.GetPokemonsByNameAsync(pokemon.Name, cancellationToken);
+    if (PokemonExists(pokemons, pokemon.Name))
     {
-        var pokemons = await _pokemonGateway.GetPokemonsByNameAsync(pokemon.Name, cancellationToken);
-        if (PokemonExists(pokemons, pokemon.Name))
-        {
             throw new PokemonAlreadyExistsException(pokemon.Name);
         }
 
