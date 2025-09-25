@@ -16,6 +16,20 @@ public class PokemonsController : ControllerBase
         _pokemonService = pokemonService;
     }
 
+    [HttpGet]
+    public async Task<ActionResult<PagedResponse<PokemonResponse>>> GetPokemonsAsync(
+        [FromQuery] string? name,
+        [FromQuery] string? type,
+        CancellationToken cancellationToken,
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string orderBy = "Name",
+        [FromQuery] string orderDirection = "asc")
+    {
+        var pokemons = await _pokemonService.GetPokemonsAsync(name, type, pageNumber, pageSize, orderBy, orderDirection, cancellationToken);
+        return Ok(pokemons);
+    }
+
     //Http Status
     // 200 OK (Si existe el pokemon)
     //400 Bad Request (Id invalido) --- Casi no se usa
@@ -30,18 +44,6 @@ public class PokemonsController : ControllerBase
         return pokemon is null ? NotFound() : Ok(pokemon.ToResponse());
     }
 
-    [HttpGet]
-    public async Task<ActionResult<IList<PokemonResponse>>> GetPokemonsByNameAsync([FromQuery] string name, [FromQuery] string type, CancellationToken cancellationToken)
-    {
-        if (string.IsNullOrEmpty(name) && string.IsNullOrEmpty(type))
-        {
-            return BadRequest(new { Message = "At least one query parameter (name or type) must be provided." });
-
-        }
-
-        var pokemons = await _pokemonService.GetPokemonsAsync(name, type, cancellationToken);
-        return Ok(pokemons.ToResponse());
-    }
     //Http Verb - Post
     //Http Status
     // 400 Bad Request (Si usuario manda informacion erronea)
@@ -93,7 +95,7 @@ public class PokemonsController : ControllerBase
         }
         catch (PokemonNotFoundException)
         {
-            return NotFound(); // 404 Not Found 
+            return NotFound(); // 404 Not Found
         }
     }
 
