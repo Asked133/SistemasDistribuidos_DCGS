@@ -84,4 +84,30 @@ public static class MobMapper
     {
         return mobs.Select(s => s.ToModel()).ToList();
     }
+
+    public static PagedMobResponseDto ToPagedResponseDto(
+        this IReadOnlyList<Mob> mobs,
+        int totalRecords)
+    {
+        return new PagedMobResponseDto
+        {
+            Mobs = mobs?.Select(m => m.ToResponseDto()).ToList()
+                   ?? new List<MobResponseDto>(),
+            TotalRecords = totalRecords
+        };
+    }
+
+    public static Mob UpdateFrom(this Mob mob, UpdateMobDto updateDto)
+    {
+        mob.Name = updateDto.Name;
+        mob.Type = updateDto.Type;
+        
+        
+        mob.Stats.Attack = updateDto.Stats.Attack;
+        mob.Stats.Speed = updateDto.Stats.Speed;
+        mob.Stats.HP = updateDto.Stats.HP;
+        
+        return mob;
+    }
+    
 }
