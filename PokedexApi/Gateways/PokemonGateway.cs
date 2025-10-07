@@ -17,7 +17,26 @@ public class PokemonGateway : IPokemonGateway
         var endpoint = new EndpointAddress(configuration.GetValue<string>("PokemonService:Url"));
         _pokemonContract = new ChannelFactory<IPokemonContract>(binding, endpoint).CreateChannel();
         _logger = logger;
-    }public async Task<(IList<Pokemon> pokemons, int totalRecords)> GetPokemonsAsync(string name, string type, int pageNumber, int pageSize, string orderBy, string orderDirection, CancellationToken cancellationToken)
+    }
+    
+    public async Task<Pokemon> UpdatePokemonAsync(Pokemon pokemon, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var updatedPokemon = await _pokemonContract.UpdatePokemon(pokemon.ToUpdateRequest(), cancellationToken);
+            return updatedPokemon.ToModel();
+        }
+        catch (FaultException ex) when (ex.Message == "Pokemon not found")
+        {
+            throw new PokemonNotFoundException(pokemon.Id);
+        }
+        catch (FaultException e) when (e.Message.Contains("already exists"))
+        {
+            throw new PokemonAlreadyExistsException(pokemon.Name);
+        }
+    }
+
+    public async Task<(IList<Pokemon> pokemons, int totalRecords)> GetPokemonsAsync(string name, string type, int pageNumber, int pageSize, string orderBy, string orderDirection, CancellationToken cancellationToken)
     {
 
         var request = new GetPokemonsRequestDto
@@ -32,7 +51,7 @@ public class PokemonGateway : IPokemonGateway
 
         var response = await _pokemonContract.GetPokemonsAsync(request);
 
-  
+
         var pokemons = response.Pokemons.ToModel();
         return (pokemons, response.TotalRecords);
     }
