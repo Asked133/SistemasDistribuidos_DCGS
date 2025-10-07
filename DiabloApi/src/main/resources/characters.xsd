@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://DiabloApi.example.com/characters"
+           xmlns:tns="http://DiabloApi.example.com/characters"
+           elementFormDefault="qualified">
+
+    <xs:complexType name="CharacterDetails">
+        <xs:sequence>
+            <xs:element name="id" type="xs:string" minOccurs="0"/>
+            <xs:element name="name" type="xs:string" minOccurs="0"/>
+            <xs:element name="characterClass" type="tns:characterClassEnum" minOccurs="0"/>
+            <xs:element name="level" type="xs:int" minOccurs="0"/>
+            <xs:element name="power" type="xs:int" minOccurs="0"/>
+            <xs:element name="armor" type="xs:int" minOccurs="0"/>
+            <xs:element name="life" type="xs:int" minOccurs="0"/>
+            <xs:element name="strength" type="xs:int" minOccurs="0"/>
+            <xs:element name="intelligence" type="xs:int" minOccurs="0"/>
+            <xs:element name="willpower" type="xs:int" minOccurs="0"/>
+            <xs:element name="dexterity" type="xs:int" minOccurs="0"/>
+            <xs:element name="message" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="createCharacterRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="name" type="xs:string"/>
+                <xs:element name="characterClass" type="tns:characterClassEnum"/>
+                <xs:element name="level" type="xs:int" minOccurs="0"/>
+                <xs:element name="power" type="xs:int" minOccurs="0"/>
+                <xs:element name="armor" type="xs:int" minOccurs="0"/>
+                <xs:element name="life" type="xs:int" minOccurs="0"/>
+                <xs:element name="strength" type="xs:int"/>
+                <xs:element name="intelligence" type="xs:int"/>
+                <xs:element name="willpower" type="xs:int"/>
+                <xs:element name="dexterity" type="xs:int"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getCharacterByIdRequest">
+        <xs:complexType><xs:sequence><xs:element name="id" type="xs:string"/></xs:sequence></xs:complexType>
+    </xs:element>
+
+    <xs:element name="getCharacterByNameRequest">
+        <xs:complexType><xs:sequence><xs:element name="name" type="xs:string"/></xs:sequence></xs:complexType>
+    </xs:element>
+
+    <xs:element name="getCharactersByClassRequest">
+        <xs:complexType><xs:sequence><xs:element name="characterClass" type="tns:characterClassEnum"/></xs:sequence></xs:complexType>
+    </xs:element>
+
+    <xs:element name="createCharacterResponse" type="tns:CharacterDetails"/>
+    <xs:element name="getCharacterByIdResponse" type="tns:CharacterDetails"/>
+    <xs:element name="getCharacterByNameResponse" type="tns:CharacterDetails"/>
+
+    <xs:element name="getCharactersByClassResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="characters" type="tns:CharacterDetails" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="message" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:simpleType name="characterClassEnum">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="BARBARIAN"/>
+            <xs:enumeration value="SORCERER"/>
+            <xs:enumeration value="NECROMANCER"/>
+            <xs:enumeration value="ROGUE"/>
+            <xs:enumeration value="DRUID"/>
+            <xs:enumeration value="SPIRITBORN"/>
+        </xs:restriction>
+    </xs:simpleType>
+</xs:schema>
