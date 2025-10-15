@@ -3,7 +3,8 @@ using PokedexApi.Dtos;
 using PokedexApi.Services;
 using PokedexApi.Mappers;
 using PokedexApi.Exceptions;
-using PokedexApi.Models;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace PokedexApi.Controllers;
 
@@ -17,7 +18,9 @@ public class PokemonsController : ControllerBase
         _pokemonService = pokemonService;
     }
 
+
     [HttpGet]
+    [Authorize]
     public async Task<ActionResult<PagedResponse<PokemonResponse>>> GetPokemonsAsync(
         [FromQuery] string? name,
         [FromQuery] string? type,
@@ -38,7 +41,9 @@ public class PokemonsController : ControllerBase
     // 500 Internal Server Error (Error del servidor)
 
     //Http Verb -Get
+
     [HttpGet("{id}", Name = "GetPokemonByIdAsync")]
+    [Authorize(Policy = "Read")]
     public async Task<ActionResult<PokemonResponse>> GetPokemonByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         var pokemon = await _pokemonService.GetPokemonByIdAsync(id, cancellationToken);
@@ -56,6 +61,7 @@ public class PokemonsController : ControllerBase
     // 202 Accepted (Si la creacion del recurso es asincrona y toma tiempo)
 
     [HttpPost]
+    [Authorize(Policy = "Write")]
     public async Task<ActionResult<PokemonResponse>> CreatePokemonAsync([FromBody] CreatePokemonRequest createPokemon, CancellationToken cancellationToken)
     {
         try
@@ -87,6 +93,7 @@ public class PokemonsController : ControllerBase
     // 500 Internal Server Error (Error del servidor)
 
     [HttpDelete("{id}")]
+    [Authorize(Policy = "Write")]
     public async Task<ActionResult> DeletePokemonAsync(Guid id, CancellationToken cancellationToken)
     {
         try
@@ -110,6 +117,7 @@ public class PokemonsController : ControllerBase
     // 500 Internal Server Error (Error del servidor)
 
     [HttpPut("{id}")]
+    [Authorize(Policy = "Write")]
     public async Task<IActionResult> UpdatePokemonAsync(Guid id, [FromBody] UpdatePokemonRequest pokemon ,CancellationToken cancellationToken)
     {
         try
@@ -142,6 +150,7 @@ public class PokemonsController : ControllerBase
     // 409 Conflict (Si el pokemon ya existe)
 
     [HttpPatch("{id}")]
+    [Authorize(Policy = "Write")]
     public async Task<ActionResult> PatchPokemonAsync(Guid id, [FromBody] PatchPokemonRequest pokemonRequest, CancellationToken cancellationToken)
     {
         try
