@@ -14,6 +14,25 @@ public class PokemonService : IPokemonServices
     {
         _pokemonRepository = pokemonRepository;
     }
+   public async Task<PagedPokemonResponseDto> GetPokemonsAsync(GetPokemonsRequestDto request)
+    {
+        var (pokemons, totalRecords) = await _pokemonRepository.GetPokemonsAsync(
+            request.Name,
+            request.Type,
+            request.PageNumber,
+            request.PageSize,
+            request.OrderBy,
+            request.OrderDirection,
+            CancellationToken.None);
+            
+        var pokemonList = pokemons?.ToResponseDto().ToList() ?? new List<PokemonResponseDto>();
+
+        return new PagedPokemonResponseDto
+        {
+            Pokemons = pokemonList,
+            TotalRecords = totalRecords
+        };
+    }
 
     public async Task<PokemonResponseDto> UpdatePokemon(UpdatePokemonDto pokemonToUpdate, CancellationToken cancellationToken)
     {
@@ -23,7 +42,7 @@ public class PokemonService : IPokemonServices
             throw new FaultException(reason: "Pokemon not found");
         }
 
-        if(!await IsPokemonAllowedToBeUpdated(pokemonToUpdate, cancellationToken))
+        if (!await IsPokemonAllowedToBeUpdated(pokemonToUpdate, cancellationToken))
         {
             throw new FaultException("Another pokemon with the same name already exists");
         }

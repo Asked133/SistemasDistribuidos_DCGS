@@ -20,4 +20,7 @@ public interface IPokemonServices
 
     [OperationContract]
     Task<PokemonResponseDto> UpdatePokemon(UpdatePokemonDto pokemon, CancellationToken cancellationToken);
+
+    [OperationContract]
+    Task<PagedPokemonResponseDto> GetPokemonsAsync(GetPokemonsRequestDto request);
 }
