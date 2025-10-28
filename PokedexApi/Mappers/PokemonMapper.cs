@@ -7,6 +7,24 @@ namespace PokedexApi.Mappers;
 
 public static class PokemonMapper
 {
+
+
+    public static Pokemon ToModel(this UpdatePokemonRequest updatePokemonRequest, Guid id)
+    {
+        return new Pokemon
+        {
+            Id = id,
+            Name = updatePokemonRequest.Name,
+            Type = updatePokemonRequest.Type,
+            Stats = new Stats
+            {
+                Attack = updatePokemonRequest.Stats.Attack,
+                Defense = updatePokemonRequest.Stats.Defense,
+                Speed = updatePokemonRequest.Stats.Speed,
+                HP = updatePokemonRequest.Stats.HP
+            }
+        };
+    }
     public static Pokemon ToModel(this PokemonResponseDto pokemonResposeDto)
     {
         return new Pokemon
@@ -62,6 +80,23 @@ public static class PokemonMapper
             Name = pokemon.Name,
             Type = pokemon.Type,
             Level = pokemon.Level,
+            Stats = new StatsDto
+            {
+                Attack = pokemon.Stats.Attack,
+                Defense = pokemon.Stats.Defense,
+                Speed = pokemon.Stats.Speed,
+                HP = pokemon.Stats.HP
+            }
+        };
+    }
+
+    public static UpdatePokemonDto ToUpdateRequest(this Pokemon pokemon)
+    {
+        return new UpdatePokemonDto
+        {
+            Id = pokemon.Id,
+            Name = pokemon.Name,
+            Type = pokemon.Type,
             Stats = new StatsDto
             {
                 Attack = pokemon.Stats.Attack,
