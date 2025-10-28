@@ -14,6 +14,43 @@ public class MobRepository : IMobRepository
         _context = context;
 
     }
+    public async Task<(IReadOnlyList<Mob> data, int totalRecords)> GetMobsAsync(string name, string type, int pageNumber, int pageSize, string orderBy, string orderDirection, CancellationToken cancellationToken)
+{
+    // Validar que pageNumber sea al menos 1
+    if (pageNumber < 1) pageNumber = 1;
+    if (pageSize < 1) pageSize = 10;
+
+    var query = _context.Mobs.AsNoTracking();
+
+    if (!string.IsNullOrEmpty(name))
+    {
+        query = query.Where(s => s.Name.Contains(name));
+    }
+
+    if (!string.IsNullOrEmpty(type))
+    {
+        query = query.Where(s => s.Type != null && s.Type.ToLower().Contains(type.ToLower()));
+    }
+
+    var totalRecords = await query.CountAsync(cancellationToken);
+
+    var isDescending = !string.IsNullOrEmpty(orderDirection) && orderDirection.Equals("desc", StringComparison.OrdinalIgnoreCase);
+    query = (!string.IsNullOrEmpty(orderBy) ? orderBy.ToLower() : "name") switch
+    {
+        "name" => isDescending ? query.OrderByDescending(p => p.Name) : query.OrderBy(p => p.Name),
+        "type" => isDescending ? query.OrderByDescending(p => p.Type) : query.OrderBy(p => p.Type),
+        "attack" => isDescending ? query.OrderByDescending(p => p.Attack) : query.OrderBy(p => p.Attack), // Usa la propiedad de la entidad!
+        _ => query.OrderBy(p => p.Name),
+    };
+
+    var pokemons = await query
+        .Skip((pageNumber - 1) * pageSize)
+        .Take(pageSize)
+        .ToListAsync(cancellationToken);
+
+    return (pokemons.ToModel(), totalRecords);
+}
+
 
     public async Task<IReadOnlyList<Mob>> GetMobsByNameAsync(string name, CancellationToken cancellationToken)
     {

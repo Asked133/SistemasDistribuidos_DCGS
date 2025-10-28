@@ -14,6 +14,9 @@ public class UpdateMobDto
     [DataMember(Name = "Type", Order = 3)]
     public string Type { get; set; }
 
-    [DataMember(Name = "Stats", Order = 4)]
+    [DataMember(Name = "Behavior", Order = 4)]
+    public string Behavior { get; set; }
+
+    [DataMember(Name = "Stats", Order = 5)]
     public StatsDto Stats { get; set; }
 }

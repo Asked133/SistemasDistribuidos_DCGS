@@ -7,6 +7,9 @@ namespace MobApi.Services;
 public interface IMobService
 {
     [OperationContract]
+    Task<PagedMobResponseDto> GetMobsAsync(GetMobsRequestDto request, CancellationToken cancellationToken);
+
+    [OperationContract]
     Task<MobResponseDto> CreateMob(CreateMobDto mob, CancellationToken cancellationToken);
     
     [OperationContract]
