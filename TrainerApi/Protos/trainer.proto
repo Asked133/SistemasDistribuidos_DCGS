@@ -5,11 +5,22 @@ package trainerpb;
 option csharp_namespace = "TrainerApi";
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
 
 service TrainerService {
-    rpc GetTrainerById (TrainerByIdRequest) returns (TrainerResponse);
-    rpc GetAllTrainersByName (TrainersByNameRequest) returns (stream TrainerResponse);
-    rpc CreateTrainers (stream CreateTrainerRequest) returns (CreateTrainerResponse);
+    rpc GetTrainerById (TrainerByIdRequest) returns (TrainerResponse); // Unary
+    rpc GetAllTrainersByName (TrainersByNameRequest) returns (stream TrainerResponse); // Server streaming
+    rpc CreateTrainers (stream CreateTrainerRequest) returns (CreateTrainerResponse);// Client streaming
+    rpc DeleteTrainer (TrainerByIdRequest) returns (google.protobuf.Empty);// Unary
+    rpc UpdateTrainer (UpdateTrainerRequest) returns (google.protobuf.Empty);// Unary
+}
+
+message UpdateTrainerRequest {
+    string id = 1;
+    string name = 2;
+    int32 age = 3;
+    google.protobuf.Timestamp birthdate = 4;
+    repeated Medal medals = 5;
 }
 
 message TrainersByNameRequest {
