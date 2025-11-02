@@ -9,17 +9,40 @@ import jakarta.xml.bind.annotation.*;
 })
 public class CharacterResponseDto {
 
+    @XmlElement(required = true)
     private String id;
+    
+    @XmlElement(required = true)
     private String name;
+    
+    @XmlElement(required = true)
     private String characterClass;
+    
+    @XmlElement(required = true)
     private Integer level;
+    
+    @XmlElement(required = true)
     private Integer power;
+    
+    @XmlElement(required = true)
     private Integer armor;
+    
+    @XmlElement(required = true)
     private Integer life;
+    
+    @XmlElement(required = true)
     private Integer strength;
+    
+    @XmlElement(required = true)
     private Integer intelligence;
+    
+    @XmlElement(required = true)
     private Integer willpower;
+    
+    @XmlElement(required = true)
     private Integer dexterity;
+    
+    @XmlElement
     private String message;
 
     public CharacterResponseDto() {

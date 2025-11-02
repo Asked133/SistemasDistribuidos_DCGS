@@ -1,6 +1,7 @@
 package com.example.DiabloApi.validators;
 
 import com.example.DiabloApi.entity.Stats;
+import diablo.api.characters.*;
 
 public class CharacterValidations {
 
@@ -32,6 +33,63 @@ public class CharacterValidations {
     public static void validateCharacterNameUnique(String name, com.example.DiabloApi.repository.CharacterRepository characterRepository) {
         if (characterRepository.findByName(name).isPresent()) {
             throw new IllegalArgumentException("Character name must be unique");
+        }
+    }
+
+    // Validaciones para JAXB request types
+    public static void validate(GetCharacterByIdRequest request) {
+        if (request.getId() == null || request.getId().trim().isEmpty()) {
+            throw new IllegalArgumentException("Character ID cannot be null or empty");
+        }
+    }
+
+    public static void validate(GetCharacterByNameRequest request) {
+        if (request.getName() == null || request.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Character name cannot be null or empty");
+        }
+    }
+
+    public static void validate(GetCharactersByClassRequest request) {
+        if (request.getCharacterClass() == null) {
+            throw new IllegalArgumentException("Character class cannot be null");
+        }
+    }
+
+    public static void validate(CreateCharacterRequest request) {
+        if (request.getName() == null || request.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Character name cannot be null or empty");
+        }
+        if (request.getCharacterClass() == null) {
+            throw new IllegalArgumentException("Character class cannot be null");
+        }
+        Integer level = request.getLevel();
+        if (level != null && level < 1) {
+            throw new IllegalArgumentException("Character level must be at least 1");
+        }
+    }
+
+    public static void validate(UpdateCharacterRequest request) {
+        if (request.getId() == null || request.getId().trim().isEmpty()) {
+            throw new IllegalArgumentException("Character ID cannot be null or empty");
+        }
+        CharacterDetails details = request.getCharacterDetails();
+        if (details == null) {
+            throw new IllegalArgumentException("Character details cannot be null");
+        }
+        if (details.getName() == null || details.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Character name cannot be null or empty");
+        }
+        if (details.getCharacterClass() == null) {
+            throw new IllegalArgumentException("Character class cannot be null");
+        }
+        if (details.getLevel() < 1) {
+            throw new IllegalArgumentException("Character level must be at least 1");
+        }
+    }
+
+    public static void validate(DeleteCharacterRequest request) {
+        if (request.getId() == null || request.getId().trim().isEmpty()) {
+            throw new IllegalArgumentException("Character ID cannot be null or empty");
         }
     }
 

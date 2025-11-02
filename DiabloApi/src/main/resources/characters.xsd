@@ -21,6 +21,39 @@
         </xs:sequence>
     </xs:complexType>
 
+    <xs:simpleType name="characterClassEnum">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="BARBARIAN"/>
+            <xs:enumeration value="SORCERER"/>
+            <xs:enumeration value="NECROMANCER"/>
+            <xs:enumeration value="ROGUE"/>
+            <xs:enumeration value="DRUID"/>
+            <xs:enumeration value="SPIRITBORN"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="getCharacterByIdRequest">
+        <xs:complexType><xs:sequence><xs:element name="id" type="xs:string"/></xs:sequence></xs:complexType>
+    </xs:element>
+    <xs:element name="getCharacterByIdResponse" type="tns:CharacterDetails"/>
+
+    <xs:element name="getCharacterByNameRequest">
+        <xs:complexType><xs:sequence><xs:element name="name" type="xs:string"/></xs:sequence></xs:complexType>
+    </xs:element>
+    <xs:element name="getCharacterByNameResponse" type="tns:CharacterDetails"/>
+
+    <xs:element name="getCharactersByClassRequest">
+        <xs:complexType><xs:sequence><xs:element name="characterClass" type="tns:characterClassEnum"/></xs:sequence></xs:complexType>
+    </xs:element>
+    <xs:element name="getCharactersByClassResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="characters" type="tns:CharacterDetails" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="message" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
     <xs:element name="createCharacterRequest">
         <xs:complexType>
             <xs:sequence>
@@ -37,40 +70,32 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-
-    <xs:element name="getCharacterByIdRequest">
-        <xs:complexType><xs:sequence><xs:element name="id" type="xs:string"/></xs:sequence></xs:complexType>
-    </xs:element>
-
-    <xs:element name="getCharacterByNameRequest">
-        <xs:complexType><xs:sequence><xs:element name="name" type="xs:string"/></xs:sequence></xs:complexType>
-    </xs:element>
-
-    <xs:element name="getCharactersByClassRequest">
-        <xs:complexType><xs:sequence><xs:element name="characterClass" type="tns:characterClassEnum"/></xs:sequence></xs:complexType>
-    </xs:element>
-
     <xs:element name="createCharacterResponse" type="tns:CharacterDetails"/>
-    <xs:element name="getCharacterByIdResponse" type="tns:CharacterDetails"/>
-    <xs:element name="getCharacterByNameResponse" type="tns:CharacterDetails"/>
 
-    <xs:element name="getCharactersByClassResponse">
+    <xs:element name="updateCharacterRequest">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="characters" type="tns:CharacterDetails" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="id" type="xs:string"/>
+                <xs:element name="characterDetails" type="tns:CharacterDetails"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="updateCharacterResponse" type="tns:CharacterDetails"/>
+
+
+    <xs:element name="deleteCharacterRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="deleteCharacterResponse">
+        <xs:complexType>
+            <xs:sequence>
                 <xs:element name="message" type="xs:string" minOccurs="0"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
 
-    <xs:simpleType name="characterClassEnum">
-        <xs:restriction base="xs:string">
-            <xs:enumeration value="BARBARIAN"/>
-            <xs:enumeration value="SORCERER"/>
-            <xs:enumeration value="NECROMANCER"/>
-            <xs:enumeration value="ROGUE"/>
-            <xs:enumeration value="DRUID"/>
-            <xs:enumeration value="SPIRITBORN"/>
-        </xs:restriction>
-    </xs:simpleType>
 </xs:schema>

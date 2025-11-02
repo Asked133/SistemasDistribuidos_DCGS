@@ -1,109 +1,118 @@
 package com.example.DiabloApi.endpoint;
 
-import com.example.DiabloApi.dto.request.*;
-import com.example.DiabloApi.dto.response.CharacterListResponseDto;
-import com.example.DiabloApi.dto.response.CharacterResponseDto;
 import com.example.DiabloApi.entity.Character;
-import com.example.DiabloApi.enums.CharacterClass;
 import com.example.DiabloApi.mapper.CharacterMapper;
 import com.example.DiabloApi.service.CharacterService;
+import com.example.DiabloApi.validators.CharacterValidations;
+// Asegúrate de que este import sea el de tus clases generadas por JAXB/XSD
+import diablo.api.characters.*; 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
 import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 
-import jakarta.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Endpoint
 public class CharacterEndpoint {
-    private static final String NAMESPACE_URI = "http://DiabloApi.example.com/characters";
+
+    // El Namespace URI de tu characters.xsd
+    private static final String NAMESPACE_URI = "http://DiabloApi.example.com/characters"; 
 
     @Autowired
-    private CharacterService characterService;
+    private CharacterService service;
 
-    private final CharacterMapper characterMapper = new CharacterMapper();
-
-    private JAXBElement<CharacterResponseDto> createResponse(CharacterResponseDto dto, String rootElementName) {
-        QName qName = new QName(NAMESPACE_URI, rootElementName);
-        return new JAXBElement<>(qName, CharacterResponseDto.class, dto);
-    }
-
-    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "createCharacterRequest")
-    @ResponsePayload
-    public JAXBElement<CharacterResponseDto> createCharacter(@RequestPayload CreateCharacterRequestDto request) {
-        CharacterResponseDto responseDto = new CharacterResponseDto();
-        try {
-            String classString = request.getCharacterClass() != null ? request.getCharacterClass().toUpperCase() : null;
-            Character character = characterService.createCharacter(
-                request.getName(), CharacterClass.valueOf(classString),
-                request.getLevel() != null ? request.getLevel() : 1,
-                request.getPower() != null ? request.getPower() : 0,
-                request.getArmor() != null ? request.getArmor() : 0,
-                request.getLife() != null ? request.getLife() : 100,
-                request.getStrength(), request.getIntelligence(),
-                request.getWillpower(), request.getDexterity()
-            );
-            responseDto = characterMapper.toCharacterResponse(character);
-            responseDto.setMessage("Character created successfully");
-        } catch (Exception e) {
-            responseDto.setMessage("Error creating character: " + e.getMessage());
-        }
-        return createResponse(responseDto, "createCharacterResponse");
-    }
+    @Autowired
+    private CharacterMapper mapper;
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getCharacterByIdRequest")
     @ResponsePayload
-    public JAXBElement<CharacterResponseDto> getCharacterById(@RequestPayload GetCharacterByIdRequestDto request) {
-        CharacterResponseDto responseDto = new CharacterResponseDto();
-        try {
-            UUID id = UUID.fromString(request.getId());
-            Optional<Character> characterOpt = characterService.findById(id);
-            if (characterOpt.isPresent()) {
-                responseDto = characterMapper.toCharacterResponse(characterOpt.get());
-                responseDto.setMessage("Character found");
-            } else {
-                responseDto.setMessage("Character not found with ID: " + request.getId());
-            }
-        } catch (Exception e) {
-            responseDto.setMessage("Error finding character by ID: " + e.getMessage());
-        }
-        return createResponse(responseDto, "getCharacterByIdResponse");
+    public CharacterDetails getCharacterById(@RequestPayload GetCharacterByIdRequest request) {
+        CharacterValidations.validate(request);
+        Character character = service.getById(UUID.fromString(request.getId())).orElse(null);
+        return mapper.toSoapDto(character);
     }
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getCharacterByNameRequest")
     @ResponsePayload
-    public JAXBElement<CharacterResponseDto> getCharacterByName(@RequestPayload GetCharacterByNameRequestDto request) {
-        CharacterResponseDto responseDto = new CharacterResponseDto();
-        try {
-            Optional<Character> characterOpt = characterService.findByName(request.getName());
-            if (characterOpt.isPresent()) {
-                responseDto = characterMapper.toCharacterResponse(characterOpt.get());
-                responseDto.setMessage("Character found");
-            } else {
-                responseDto.setMessage("Character not found with name: " + request.getName());
-            }
-        } catch (Exception e) {
-            responseDto.setMessage("Error finding character by name: " + e.getMessage());
-        }
-        return createResponse(responseDto, "getCharacterByNameResponse");
+    public CharacterDetails getCharacterByName(@RequestPayload GetCharacterByNameRequest request) {
+        CharacterValidations.validate(request);
+        Character character = service.getByName(request.getName()).orElse(null);
+        return mapper.toSoapDto(character);
     }
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getCharactersByClassRequest")
     @ResponsePayload
-    public CharacterListResponseDto getCharactersByClass(@RequestPayload GetCharactersByClassRequestDto request) {
-        try {
-            String classString = request.getCharacterClass() != null ? request.getCharacterClass().toUpperCase() : null;
-            List<Character> characters = characterService.findByCharacterClass(CharacterClass.valueOf(classString));
-            return characterMapper.toCharacterListResponse(characters);
-        } catch (Exception e) {
-            CharacterListResponseDto error = new CharacterListResponseDto();
-            error.setMessage("Error listing characters by class: " + e.getMessage());
-            return error;
-        }
+    public GetCharactersByClassResponse getCharactersByClass(@RequestPayload GetCharactersByClassRequest request) {
+        CharacterValidations.validate(request);
+        List<Character> characters = service.getAllByClass(mapper.toEntityEnum(request.getCharacterClass()));
+        
+        GetCharactersByClassResponse response = new GetCharactersByClassResponse();
+        characters.stream()
+                .map(mapper::toSoapDto)
+                .forEach(response.getCharacters()::add);
+        return response;
+    }
+
+    /**
+     * ================== CORRECCIÓN AQUÍ ==================
+     *
+     * 1. Mapea el request a la entidad (characterToSave).
+     * 2. Llama al servicio, que guarda Y DEVUELVE la entidad con ID (savedCharacter).
+     * 3. Mapea la "savedCharacter" (con ID) a la respuesta SOAP.
+     */
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "createCharacterRequest")
+    @ResponsePayload
+    public CharacterDetails createCharacter(@RequestPayload CreateCharacterRequest request) {
+        CharacterValidations.validate(request);
+        
+        // 1. Entidad sin ID
+        Character characterToSave = mapper.toEntity(request); 
+        
+        // 2. Entidad CON ID (devuelta por el servicio)
+        Character savedCharacter = service.createCharacter(characterToSave); 
+        
+        // 3. Mapea la entidad con ID a la respuesta
+        return mapper.toSoapDto(savedCharacter);
+    }
+
+    /**
+     * ================== CORRECCIÓN AQUÍ ==================
+     *
+     * 1. Valida y busca la entidad existente.
+     * 2. Mapea los cambios del request a la entidad existente.
+     * 3. Llama al servicio, que guarda Y DEVUELVE la entidad actualizada.
+     * 4. Mapea la entidad actualizada a la respuesta SOAP.
+     */
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "updateCharacterRequest")
+    @ResponsePayload
+    public CharacterDetails updateCharacter(@RequestPayload UpdateCharacterRequest request) {
+        CharacterValidations.validate(request);
+        
+        // 1. Obtiene la entidad actual
+        Character existingCharacter = service.getById(UUID.fromString(request.getId())).orElse(null);
+        // (La validación ya debería haber lanzado error si es nulo)
+
+        // 2. Mapea los cambios
+        mapper.updateEntityFromSoapDto(request.getCharacterDetails(), existingCharacter);
+        
+        // 3. Guarda y captura la entidad actualizada
+        Character updatedCharacter = service.updateCharacter(existingCharacter);
+        
+        // 4. Mapea la entidad actualizada a la respuesta
+        return mapper.toSoapDto(updatedCharacter);
+    }
+
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "deleteCharacterRequest")
+    @ResponsePayload
+    public DeleteCharacterResponse deleteCharacter(@RequestPayload DeleteCharacterRequest request) {
+        CharacterValidations.validate(request);
+        service.deleteCharacter(UUID.fromString(request.getId()));
+        
+        DeleteCharacterResponse response = new DeleteCharacterResponse();
+        response.setMessage("Character with id " + request.getId() + " was successfully deleted.");
+        return response;
     }
 }

@@ -4,13 +4,14 @@ import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.ws.config.annotation.EnableWs;
 import org.springframework.ws.config.annotation.WsConfigurationSupport;
 import org.springframework.ws.transport.http.MessageDispatcherServlet;
 import org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition;
 import org.springframework.xml.xsd.SimpleXsdSchema;
 import org.springframework.xml.xsd.XsdSchema;
-import org.springframework.core.io.ClassPathResource;
 
 @EnableWs
 @Configuration
@@ -42,5 +43,15 @@ public class WebServiceConfig extends WsConfigurationSupport {
     @Bean
     public XsdSchema charactersSchema() {
         return new SimpleXsdSchema(new ClassPathResource("characters.xsd"));
+    }
+
+    @Bean(name = "marshaller")
+    public Jaxb2Marshaller jaxb2Marshaller() {
+        Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
+        marshaller.setPackagesToScan(
+            "com.example.DiabloApi.dto.request",
+            "com.example.DiabloApi.dto.response"
+        );
+        return marshaller;
     }
 }

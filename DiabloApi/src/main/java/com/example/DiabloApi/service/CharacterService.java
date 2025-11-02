@@ -1,13 +1,12 @@
 package com.example.DiabloApi.service;
 
 import com.example.DiabloApi.entity.Character;
-import com.example.DiabloApi.entity.Stats;
 import com.example.DiabloApi.enums.CharacterClass;
 import com.example.DiabloApi.repository.CharacterRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.example.DiabloApi.validators.CharacterValidations;
-
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,47 +16,77 @@ import java.util.UUID;
 public class CharacterService {
 
     @Autowired
-    private CharacterRepository characterRepository;
+    private CharacterRepository repository;
 
-    // Metodo para crear un nuevo personaje con validaciones
-
-    public Character createCharacter(String name, CharacterClass characterClass, int level,
-            int power, int armor, int life, int strength,
-            int intelligence, int willpower, int dexterity) {
-        CharacterValidations.validateCharacterName(name);
-        CharacterValidations.validateCharacterNameUnique(name, characterRepository);
-        CharacterValidations.validateCharacterLevel(level);
-        CharacterValidations.validateCharacterStats(new Stats(strength, intelligence, willpower, dexterity));
-
-
-        Stats stats = new Stats(strength, intelligence, willpower, dexterity);
-
-
-        Character character = new Character();
-        character.setName(name);
-        character.setCharacterClass(characterClass);
-        character.setLevel(level);
-        character.setPower(power);
-        character.setArmor(armor);
-        character.setLife(life);
-        character.setStats(stats);
-
-        return characterRepository.save(character);
+    @Transactional(readOnly = true)
+    public Optional<Character> getById(UUID id) {
+        return repository.findById(id);
     }
 
-
-    // Metodo para buscar un personaje por su ID
-    public Optional<Character> findById(UUID id) {
-        return characterRepository.findById(id);
+    @Transactional(readOnly = true)
+    public Optional<Character> getByName(String name) {
+        return repository.findByName(name);
     }
 
-    // Metodo para buscar un personaje por su nombre
-    public Optional<Character> findByName(String name) {
-        return characterRepository.findByName(name);
+    @Transactional(readOnly = true)
+    public List<Character> getAllByClass(CharacterClass characterClass) {
+        return repository.findByCharacterClass(characterClass);
     }
 
-    // Metodo para buscar personajes por su clase
-    public List<Character> findByCharacterClass(CharacterClass characterClass) {
-        return characterRepository.findByCharacterClass(characterClass);
+    /**
+     * ================== CORRECCIÓN AQUÍ ==================
+     *
+     * El método "repository.save(character)" devuelve la entidad
+     * guardada y actualizada (con el ID).
+     * Debemos retornar esa instancia.
+     *
+     * @param character La entidad a guardar (sin ID)
+     * @return La entidad guardada (CON ID)
+     */
+    @Transactional
+    public Character createCharacter(Character character) {
+        // ANTES:
+        // repository.save(character);
+        // return character; // <-- Esto devolvía la entidad original sin ID
+        
+        // AHORA:
+        return repository.save(character);
+    }
+    
+    /**
+     * ================== CORRECCIÓN AQUÍ ==================
+     *
+     * Al igual que en create, el método "save" para actualizar
+     * también devuelve la entidad actualizada.
+     *
+     * @param existingCharacter La entidad actualizada
+     * @return La entidad guardada en la BBDD
+     */
+    @Transactional
+    public Character updateCharacter(Character existingCharacter) {
+        // ANTES:
+        // repository.save(existingCharacter);
+        // return existingCharacter;
+        
+        // AHORA:
+        return repository.save(existingCharacter);
+    }
+
+    @Transactional
+    public void deleteCharacter(UUID id) {
+        if (!repository.existsById(id)) {
+            throw new EntityNotFoundException("Character not found with id: " + id);
+        }
+        repository.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean existsByName(String name) {
+        return repository.findByName(name).isPresent();
+    }
+
+    @Transactional(readOnly = true)
+    public boolean existsById(UUID id) {
+        return repository.existsById(id);
     }
 }

@@ -1,0 +1,286 @@
+{
+	"info": {
+		"_postman_id": "diablodex-api-collection",
+		"name": "DiablodexApi - REST API",
+		"description": "API REST para gestión de personajes de Diablo IV. Incluye autenticación OAuth2 con Hydra, caché con Redis, y paginación HATEOAS.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Characters",
+			"item": [
+				{
+					"name": "GET All Characters (Paginated)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/characters?class=BARBARIAN&page=0&pageSize=10&sort=name",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"characters"
+							],
+							"query": [
+								{
+									"key": "class",
+									"value": "BARBARIAN",
+									"description": "Clase del personaje (BARBARIAN, DRUID, NECROMANCER, ROGUE, SORCERER)"
+								},
+								{
+									"key": "page",
+									"value": "0",
+									"description": "Número de página (default: 0)"
+								},
+								{
+									"key": "pageSize",
+									"value": "10",
+									"description": "Tamaño de página (default: 10)"
+								},
+								{
+									"key": "sort",
+									"value": "name",
+									"description": "Campo de ordenamiento (default: name)"
+								}
+							]
+						},
+						"description": "Obtiene una lista paginada de personajes filtrados por clase. Utiliza caché de Redis."
+					},
+					"response": []
+				},
+				{
+					"name": "GET Character by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/characters/char-001",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"characters",
+								"char-001"
+							]
+						},
+						"description": "Obtiene un personaje específico por su ID. Incluye enlaces HATEOAS."
+					},
+					"response": []
+				},
+				{
+					"name": "POST Create Character",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Lyra Shadowblade\",\n  \"characterClass\": \"ROGUE\",\n  \"level\": 60,\n  \"power\": 1200,\n  \"armor\": 850,\n  \"life\": 3500,\n  \"stats\": {\n    \"strength\": 400,\n    \"intelligence\": 500,\n    \"willpower\": 650,\n    \"dexterity\": 950\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/characters",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"characters"
+							]
+						},
+						"description": "Crea un nuevo personaje. Requiere scope 'write'. Invalida caché automáticamente."
+					},
+					"response": []
+				},
+				{
+					"name": "PUT Update Character (Full)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Bjorn the Legendary\",\n  \"characterClass\": \"BARBARIAN\",\n  \"level\": 80,\n  \"power\": 1500,\n  \"armor\": 1200,\n  \"life\": 5000,\n  \"stats\": {\n    \"strength\": 1000,\n    \"intelligence\": 300,\n    \"willpower\": 850,\n    \"dexterity\": 500\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/characters/char-001",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"characters",
+								"char-001"
+							]
+						},
+						"description": "Reemplaza completamente un personaje existente. Requiere scope 'write'."
+					},
+					"response": []
+				},
+				{
+					"name": "PATCH Update Character (Partial)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"level\": 85\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/characters/char-001",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"characters",
+								"char-001"
+							]
+						},
+						"description": "Actualiza parcialmente un personaje (solo campos enviados). Requiere scope 'write'."
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE Character",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/characters/char-001",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"characters",
+								"char-001"
+							]
+						},
+						"description": "Elimina un personaje. Requiere scope 'write'. Retorna 204 No Content."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints para gestión de personajes de Diablo IV"
+		},
+		{
+			"name": "OAuth2",
+			"item": [
+				{
+					"name": "Get Access Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "{{client_id}}",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "{{client_secret}}",
+									"type": "text"
+								},
+								{
+									"key": "scope",
+									"value": "read write",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{hydra_url}}/oauth2/token",
+							"host": [
+								"{{hydra_url}}"
+							],
+							"path": [
+								"oauth2",
+								"token"
+							]
+						},
+						"description": "Obtiene un token de acceso OAuth2 desde Hydra con scopes 'read' y 'write'."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints de autenticación OAuth2"
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Auto-refresh OAuth2 token before each request",
+					"const tokenUrl = pm.environment.get('hydra_url') + '/oauth2/token';",
+					"const clientId = pm.environment.get('client_id');",
+					"const clientSecret = pm.environment.get('client_secret');",
+					"",
+					"if (!clientId || !clientSecret) {",
+					"    console.log('⚠️  Client credentials not configured. Set client_id and client_secret in environment.');",
+					"    return;",
+					"}",
+					"",
+					"pm.sendRequest({",
+					"    url: tokenUrl,",
+					"    method: 'POST',",
+					"    header: {",
+					"        'Content-Type': 'application/x-www-form-urlencoded'",
+					"    },",
+					"    body: {",
+					"        mode: 'urlencoded',",
+					"        urlencoded: [",
+					"            {key: 'grant_type', value: 'client_credentials'},",
+					"            {key: 'client_id', value: clientId},",
+					"            {key: 'client_secret', value: clientSecret},",
+					"            {key: 'scope', value: 'read write'}",
+					"        ]",
+					"    }",
+					"}, (err, res) => {",
+					"    if (err) {",
+					"        console.error('❌ Error obtaining token:', err);",
+					"    } else {",
+					"        const jsonData = res.json();",
+					"        pm.environment.set('access_token', jsonData.access_token);",
+					"        console.log('✅ Token refreshed successfully');",
+					"    }",
+					"});"
+				]
+			}
+		}
+	]
+}
