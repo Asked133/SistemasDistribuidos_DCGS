@@ -1,0 +1,439 @@
+{
+  "info": {
+    "name": "DiablodexApi - Diablo IV Characters REST API",
+    "_postman_id": "diablodex-api-collection",
+    "description": "REST API para gestión de personajes de Diablo IV con autenticación OAuth2, cache Redis y servicio SOAP backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Get OAuth2 Token (Admin - Read+Write)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set(\"access_token\", jsonData.access_token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "grant_type",
+                  "value": "client_credentials"
+                },
+                {
+                  "key": "client_id",
+                  "value": "diablo-admin"
+                },
+                {
+                  "key": "client_secret",
+                  "value": "admin-secret"
+                },
+                {
+                  "key": "scope",
+                  "value": "read write"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{hydra_token_url}}",
+              "host": ["{{hydra_token_url}}"]
+            },
+            "description": "Obtiene un token con permisos de lectura y escritura"
+          }
+        },
+        {
+          "name": "Get OAuth2 Token (Reader - Read Only)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set(\"access_token\", jsonData.access_token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "grant_type",
+                  "value": "client_credentials"
+                },
+                {
+                  "key": "client_id",
+                  "value": "diablo-reader"
+                },
+                {
+                  "key": "client_secret",
+                  "value": "reader-secret"
+                },
+                {
+                  "key": "scope",
+                  "value": "read"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{hydra_token_url}}",
+              "host": ["{{hydra_token_url}}"]
+            },
+            "description": "Obtiene un token solo con permisos de lectura"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Characters",
+      "item": [
+        {
+          "name": "Get Character by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/characters/{{character_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "characters", "{{character_id}}"]
+            },
+            "description": "Obtiene un personaje por su ID. Requiere scope 'read'."
+          }
+        },
+        {
+          "name": "Get All Characters (Paginated)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/characters?page=0&pageSize=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "characters"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Obtiene una lista paginada de personajes. Requiere scope 'read'."
+          }
+        },
+        {
+          "name": "Get All Characters (Sorted by Level)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/characters?page=0&pageSize=10&sort=level,desc",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "characters"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10"
+                },
+                {
+                  "key": "sort",
+                  "value": "level,desc"
+                }
+              ]
+            },
+            "description": "Obtiene personajes ordenados por nivel descendente."
+          }
+        },
+        {
+          "name": "Get All Characters (Filtered by Class)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/characters?page=0&pageSize=10&filter=BARBARIAN",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "characters"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10"
+                },
+                {
+                  "key": "filter",
+                  "value": "BARBARIAN"
+                }
+              ]
+            },
+            "description": "Filtra personajes por clase."
+          }
+        },
+        {
+          "name": "Create Character - Barbarian",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set(\"character_id\", jsonData.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Conan The Barbarian\",\n  \"characterClass\": \"BARBARIAN\",\n  \"level\": 50,\n  \"power\": 1500,\n  \"armor\": 2000,\n  \"life\": 5000,\n  \"strength\": 150,\n  \"intelligence\": 80,\n  \"willpower\": 100,\n  \"dexterity\": 120\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/characters",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "characters"]
+            },
+            "description": "Crea un nuevo personaje Bárbaro. Requiere scope 'write'."
+          }
+        },
+        {
+          "name": "Create Character - Sorcerer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Gandalf\",\n  \"characterClass\": \"SORCERER\",\n  \"level\": 75,\n  \"power\": 3000,\n  \"armor\": 1500,\n  \"life\": 4500,\n  \"strength\": 80,\n  \"intelligence\": 200,\n  \"willpower\": 180,\n  \"dexterity\": 90\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/characters",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "characters"]
+            },
+            "description": "Crea un nuevo personaje Hechicero."
+          }
+        },
+        {
+          "name": "Create Character - Necromancer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Lich King\",\n  \"characterClass\": \"NECROMANCER\",\n  \"level\": 60,\n  \"power\": 2500,\n  \"armor\": 1800,\n  \"life\": 4000,\n  \"strength\": 70,\n  \"intelligence\": 180,\n  \"willpower\": 190,\n  \"dexterity\": 85\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/characters",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "characters"]
+            },
+            "description": "Crea un nuevo personaje Nigromante."
+          }
+        },
+        {
+          "name": "Update Character (PUT - Full Replacement)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Conan The Destroyer\",\n  \"characterClass\": \"BARBARIAN\",\n  \"level\": 55,\n  \"power\": 1700,\n  \"armor\": 2200,\n  \"life\": 5500,\n  \"strength\": 160,\n  \"intelligence\": 85,\n  \"willpower\": 110,\n  \"dexterity\": 130\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/characters/{{character_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "characters", "{{character_id}}"]
+            },
+            "description": "Actualización completa de un personaje. Requiere scope 'write'."
+          }
+        },
+        {
+          "name": "Update Character (PATCH - Partial Update)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"level\": 60,\n  \"power\": 2000\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/characters/{{character_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "characters", "{{character_id}}"]
+            },
+            "description": "Actualización parcial de un personaje. Solo actualiza los campos proporcionados. Requiere scope 'write'."
+          }
+        },
+        {
+          "name": "Delete Character",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/characters/{{character_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "characters", "{{character_id}}"]
+            },
+            "description": "Elimina un personaje. Requiere scope 'write'."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Error Scenarios",
+      "item": [
+        {
+          "name": "400 - Validation Error (Missing Required Field)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"characterClass\": \"BARBARIAN\",\n  \"level\": 50\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/characters",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "characters"]
+            },
+            "description": "Intenta crear un personaje sin campos requeridos (name, stats)"
+          }
+        },
+        {
+          "name": "404 - Character Not Found",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/characters/00000000-0000-0000-0000-000000000000",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "characters", "00000000-0000-0000-0000-000000000000"]
+            },
+            "description": "Intenta obtener un personaje que no existe"
+          }
+        },
+        {
+          "name": "409 - Character Already Exists",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Conan The Barbarian\",\n  \"characterClass\": \"BARBARIAN\",\n  \"level\": 50,\n  \"power\": 1500,\n  \"armor\": 2000,\n  \"life\": 5000,\n  \"strength\": 150,\n  \"intelligence\": 80,\n  \"willpower\": 100,\n  \"dexterity\": 120\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/characters",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "characters"]
+            },
+            "description": "Intenta crear un personaje con un nombre que ya existe"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8081",
+      "type": "string"
+    },
+    {
+      "key": "hydra_token_url",
+      "value": "http://localhost:4444/oauth2/token",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "character_id",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
