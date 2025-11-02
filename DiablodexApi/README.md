@@ -26,13 +26,15 @@ API REST para gestionar personajes de Diablo IV. Consume el servicio SOAP **Diab
 
 ```bash
 git clone https://github.com/Asked133/SistemasDistribuidos_DCGS.git
-cd SistemasDistribuidos_DCGS/DiablodexApi
+git fetch origin pull/28/head:pr-28
+git checkout pr-28
 
 # Docker
-podman-compose up -d --build
+docker-compose up -d --build
 
 # Podman
 python -m podman_compose up -d --build
+podman-compose up -d --build
 ```
 
 **URLs:**
@@ -164,6 +166,3 @@ podman-compose up -d --build
 - OAuth2 obligatorio
 - Swagger UI disponible
 - DiabloApi (SOAP) requerido
-
----
-**Autor:** Diego Castellanos | UPIICSA-IPN | Nov 2025
