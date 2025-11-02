@@ -38,21 +38,90 @@
         </xs:complexType>
     </xs:element>
 
+    <xs:element name="updateCharacterRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:string"/>
+                <xs:element name="name" type="xs:string" minOccurs="0"/>
+                <xs:element name="characterClass" type="tns:characterClassEnum" minOccurs="0"/>
+                <xs:element name="level" type="xs:int" minOccurs="0"/>
+                <xs:element name="power" type="xs:int" minOccurs="0"/>
+                <xs:element name="armor" type="xs:int" minOccurs="0"/>
+                <xs:element name="life" type="xs:int" minOccurs="0"/>
+                <xs:element name="strength" type="xs:int" minOccurs="0"/>
+                <xs:element name="intelligence" type="xs:int" minOccurs="0"/>
+                <xs:element name="willpower" type="xs:int" minOccurs="0"/>
+                <xs:element name="dexterity" type="xs:int" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="deleteCharacterRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getAllCharactersRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="page" type="xs:int" minOccurs="0"/>
+                <xs:element name="size" type="xs:int" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
     <xs:element name="getCharacterByIdRequest">
-        <xs:complexType><xs:sequence><xs:element name="id" type="xs:string"/></xs:sequence></xs:complexType>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
     </xs:element>
 
     <xs:element name="getCharacterByNameRequest">
-        <xs:complexType><xs:sequence><xs:element name="name" type="xs:string"/></xs:sequence></xs:complexType>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="name" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
     </xs:element>
 
     <xs:element name="getCharactersByClassRequest">
-        <xs:complexType><xs:sequence><xs:element name="characterClass" type="tns:characterClassEnum"/></xs:sequence></xs:complexType>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="characterClass" type="tns:characterClassEnum"/>
+            </xs:sequence>
+        </xs:complexType>
     </xs:element>
 
     <xs:element name="createCharacterResponse" type="tns:CharacterDetails"/>
+    <xs:element name="updateCharacterResponse" type="tns:CharacterDetails"/>
+    
+    <xs:element name="deleteCharacterResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="success" type="xs:boolean"/>
+                <xs:element name="message" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
     <xs:element name="getCharacterByIdResponse" type="tns:CharacterDetails"/>
     <xs:element name="getCharacterByNameResponse" type="tns:CharacterDetails"/>
+
+    <xs:element name="getAllCharactersResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="characters" type="tns:CharacterDetails" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="totalElements" type="xs:long" minOccurs="0"/>
+                <xs:element name="totalPages" type="xs:int" minOccurs="0"/>
+                <xs:element name="message" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
 
     <xs:element name="getCharactersByClassResponse">
         <xs:complexType>

@@ -38,7 +38,8 @@ services:
       - SPRING_DATASOURCE_PASSWORD=secret
       - SERVER_PORT=8055
     depends_on:
-      - diablo-mysql
+      diablo-mysql:
+        condition: service_healthy
     networks:
       - diablo-network
     restart: unless-stopped
