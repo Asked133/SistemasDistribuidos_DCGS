@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bindings version="3.0" xmlns="https://jakarta.ee/xml/ns/jaxb">
+  <!--
+
+Este archivo ha sido generado por Eclipse Implementation of JAXB v3.0.0 
+Visite https://eclipse-ee4j.github.io/jaxb-ri 
+Todas las modificaciones realizadas en este archivo se perderán si se vuelve a compilar el esquema de origen. 
+Generado el: 2025.11.01 a las 10:59:17 PM CST 
+
+  -->
+  <bindings scd="x-schema::tns" xmlns:tns="http://DiabloApi.example.com/characters">
+    <schemaBindings map="false">
+      <package name="com.example.DiablodexApi.soap.client.generated"/>
+    </schemaBindings>
+    <bindings scd="tns:createCharacterRequest">
+      <class ref="com.example.DiablodexApi.soap.client.generated.CreateCharacterRequest"/>
+    </bindings>
+    <bindings scd="tns:updateCharacterRequest">
+      <class ref="com.example.DiablodexApi.soap.client.generated.UpdateCharacterRequest"/>
+    </bindings>
+    <bindings scd="tns:deleteCharacterRequest">
+      <class ref="com.example.DiablodexApi.soap.client.generated.DeleteCharacterRequest"/>
+    </bindings>
+    <bindings scd="tns:getAllCharactersRequest">
+      <class ref="com.example.DiablodexApi.soap.client.generated.GetAllCharactersRequest"/>
+    </bindings>
+    <bindings scd="tns:getCharacterByIdRequest">
+      <class ref="com.example.DiablodexApi.soap.client.generated.GetCharacterByIdRequest"/>
+    </bindings>
+    <bindings scd="tns:getCharacterByNameRequest">
+      <class ref="com.example.DiablodexApi.soap.client.generated.GetCharacterByNameRequest"/>
+    </bindings>
+    <bindings scd="tns:getCharactersByClassRequest">
+      <class ref="com.example.DiablodexApi.soap.client.generated.GetCharactersByClassRequest"/>
+    </bindings>
+    <bindings scd="~tns:CharacterDetails">
+      <class ref="com.example.DiablodexApi.soap.client.generated.CharacterDetails"/>
+    </bindings>
+    <bindings scd="tns:deleteCharacterResponse">
+      <class ref="com.example.DiablodexApi.soap.client.generated.DeleteCharacterResponse"/>
+    </bindings>
+    <bindings scd="tns:getAllCharactersResponse">
+      <class ref="com.example.DiablodexApi.soap.client.generated.GetAllCharactersResponse"/>
+    </bindings>
+    <bindings scd="tns:getCharactersByClassResponse">
+      <class ref="com.example.DiablodexApi.soap.client.generated.GetCharactersByClassResponse"/>
+    </bindings>
+    <bindings scd="~tns:characterClassEnum">
+      <typesafeEnumClass ref="com.example.DiablodexApi.soap.client.generated.CharacterClassEnum"/>
+    </bindings>
+  </bindings>
+</bindings>
+
