@@ -1,29 +1,51 @@
-C:\Users\dcgom\OneDrive\Documentos\Documentos\Universidad\5to Semestre\Sistemas Distribuidos\Repo\SistemasDistribuidos_DCGS\DiablodexApi\src\main\java\com\example\DiablodexApi\config\RedisConfig.java
-C:\Users\dcgom\OneDrive\Documentos\Documentos\Universidad\5to Semestre\Sistemas Distribuidos\Repo\SistemasDistribuidos_DCGS\DiablodexApi\src\main\java\com\example\DiablodexApi\config\SecurityConfig.java
-C:\Users\dcgom\OneDrive\Documentos\Documentos\Universidad\5to Semestre\Sistemas Distribuidos\Repo\SistemasDistribuidos_DCGS\DiablodexApi\src\main\java\com\example\DiablodexApi\config\SoapClientConfig.java
-C:\Users\dcgom\OneDrive\Documentos\Documentos\Universidad\5to Semestre\Sistemas Distribuidos\Repo\SistemasDistribuidos_DCGS\DiablodexApi\src\main\java\com\example\DiablodexApi\controller\CharacterController.java
-C:\Users\dcgom\OneDrive\Documentos\Documentos\Universidad\5to Semestre\Sistemas Distribuidos\Repo\SistemasDistribuidos_DCGS\DiablodexApi\src\main\java\com\example\DiablodexApi\DiablodexApiApplication.java
-C:\Users\dcgom\OneDrive\Documentos\Documentos\Universidad\5to Semestre\Sistemas Distribuidos\Repo\SistemasDistribuidos_DCGS\DiablodexApi\src\main\java\com\example\DiablodexApi\dto\CharacterDto.java
-C:\Users\dcgom\OneDrive\Documentos\Documentos\Universidad\5to Semestre\Sistemas Distribuidos\Repo\SistemasDistribuidos_DCGS\DiablodexApi\src\main\java\com\example\DiablodexApi\dto\CreateCharacterDto.java
-C:\Users\dcgom\OneDrive\Documentos\Documentos\Universidad\5to Semestre\Sistemas Distribuidos\Repo\SistemasDistribuidos_DCGS\DiablodexApi\src\main\java\com\example\DiablodexApi\dto\ErrorResponse.java
-C:\Users\dcgom\OneDrive\Documentos\Documentos\Universidad\5to Semestre\Sistemas Distribuidos\Repo\SistemasDistribuidos_DCGS\DiablodexApi\src\main\java\com\example\DiablodexApi\dto\PagedCharacterResponse.java
-C:\Users\dcgom\OneDrive\Documentos\Documentos\Universidad\5to Semestre\Sistemas Distribuidos\Repo\SistemasDistribuidos_DCGS\DiablodexApi\src\main\java\com\example\DiablodexApi\dto\UpdateCharacterDto.java
-C:\Users\dcgom\OneDrive\Documentos\Documentos\Universidad\5to Semestre\Sistemas Distribuidos\Repo\SistemasDistribuidos_DCGS\DiablodexApi\src\main\java\com\example\DiablodexApi\exception\CharacterAlreadyExistsException.java
-C:\Users\dcgom\OneDrive\Documentos\Documentos\Universidad\5to Semestre\Sistemas Distribuidos\Repo\SistemasDistribuidos_DCGS\DiablodexApi\src\main\java\com\example\DiablodexApi\exception\CharacterNotFoundException.java
-C:\Users\dcgom\OneDrive\Documentos\Documentos\Universidad\5to Semestre\Sistemas Distribuidos\Repo\SistemasDistribuidos_DCGS\DiablodexApi\src\main\java\com\example\DiablodexApi\exception\GlobalExceptionHandler.java
-C:\Users\dcgom\OneDrive\Documentos\Documentos\Universidad\5to Semestre\Sistemas Distribuidos\Repo\SistemasDistribuidos_DCGS\DiablodexApi\src\main\java\com\example\DiablodexApi\exception\SoapServiceException.java
-C:\Users\dcgom\OneDrive\Documentos\Documentos\Universidad\5to Semestre\Sistemas Distribuidos\Repo\SistemasDistribuidos_DCGS\DiablodexApi\src\main\java\com\example\DiablodexApi\service\CharacterService.java
-C:\Users\dcgom\OneDrive\Documentos\Documentos\Universidad\5to Semestre\Sistemas Distribuidos\Repo\SistemasDistribuidos_DCGS\DiablodexApi\target\generated-sources\xjc\com\example\DiablodexApi\soap\client\generated\CharacterClassEnum.java
-C:\Users\dcgom\OneDrive\Documentos\Documentos\Universidad\5to Semestre\Sistemas Distribuidos\Repo\SistemasDistribuidos_DCGS\DiablodexApi\target\generated-sources\xjc\com\example\DiablodexApi\soap\client\generated\CharacterDetails.java
-C:\Users\dcgom\OneDrive\Documentos\Documentos\Universidad\5to Semestre\Sistemas Distribuidos\Repo\SistemasDistribuidos_DCGS\DiablodexApi\target\generated-sources\xjc\com\example\DiablodexApi\soap\client\generated\CreateCharacterRequest.java
-C:\Users\dcgom\OneDrive\Documentos\Documentos\Universidad\5to Semestre\Sistemas Distribuidos\Repo\SistemasDistribuidos_DCGS\DiablodexApi\target\generated-sources\xjc\com\example\DiablodexApi\soap\client\generated\DeleteCharacterRequest.java
-C:\Users\dcgom\OneDrive\Documentos\Documentos\Universidad\5to Semestre\Sistemas Distribuidos\Repo\SistemasDistribuidos_DCGS\DiablodexApi\target\generated-sources\xjc\com\example\DiablodexApi\soap\client\generated\DeleteCharacterResponse.java
-C:\Users\dcgom\OneDrive\Documentos\Documentos\Universidad\5to Semestre\Sistemas Distribuidos\Repo\SistemasDistribuidos_DCGS\DiablodexApi\target\generated-sources\xjc\com\example\DiablodexApi\soap\client\generated\GetAllCharactersRequest.java
-C:\Users\dcgom\OneDrive\Documentos\Documentos\Universidad\5to Semestre\Sistemas Distribuidos\Repo\SistemasDistribuidos_DCGS\DiablodexApi\target\generated-sources\xjc\com\example\DiablodexApi\soap\client\generated\GetAllCharactersResponse.java
-C:\Users\dcgom\OneDrive\Documentos\Documentos\Universidad\5to Semestre\Sistemas Distribuidos\Repo\SistemasDistribuidos_DCGS\DiablodexApi\target\generated-sources\xjc\com\example\DiablodexApi\soap\client\generated\GetCharacterByIdRequest.java
-C:\Users\dcgom\OneDrive\Documentos\Documentos\Universidad\5to Semestre\Sistemas Distribuidos\Repo\SistemasDistribuidos_DCGS\DiablodexApi\target\generated-sources\xjc\com\example\DiablodexApi\soap\client\generated\GetCharacterByNameRequest.java
-C:\Users\dcgom\OneDrive\Documentos\Documentos\Universidad\5to Semestre\Sistemas Distribuidos\Repo\SistemasDistribuidos_DCGS\DiablodexApi\target\generated-sources\xjc\com\example\DiablodexApi\soap\client\generated\GetCharactersByClassRequest.java
-C:\Users\dcgom\OneDrive\Documentos\Documentos\Universidad\5to Semestre\Sistemas Distribuidos\Repo\SistemasDistribuidos_DCGS\DiablodexApi\target\generated-sources\xjc\com\example\DiablodexApi\soap\client\generated\GetCharactersByClassResponse.java
-C:\Users\dcgom\OneDrive\Documentos\Documentos\Universidad\5to Semestre\Sistemas Distribuidos\Repo\SistemasDistribuidos_DCGS\DiablodexApi\target\generated-sources\xjc\com\example\DiablodexApi\soap\client\generated\ObjectFactory.java
-C:\Users\dcgom\OneDrive\Documentos\Documentos\Universidad\5to Semestre\Sistemas Distribuidos\Repo\SistemasDistribuidos_DCGS\DiablodexApi\target\generated-sources\xjc\com\example\DiablodexApi\soap\client\generated\package-info.java
-C:\Users\dcgom\OneDrive\Documentos\Documentos\Universidad\5to Semestre\Sistemas Distribuidos\Repo\SistemasDistribuidos_DCGS\DiablodexApi\target\generated-sources\xjc\com\example\DiablodexApi\soap\client\generated\UpdateCharacterRequest.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/src/main/java/com/example/DiablodexApi/DiablodexApiApplication.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/src/main/java/com/example/DiablodexApi/config/RedisConfig.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/src/main/java/com/example/DiablodexApi/config/SecurityConfig.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/src/main/java/com/example/DiablodexApi/config/SoapClientConfig.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/src/main/java/com/example/DiablodexApi/controller/CharacterController.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/src/main/java/com/example/DiablodexApi/controller/ItemController.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/src/main/java/com/example/DiablodexApi/dto/BulkCreateResponseDto.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/src/main/java/com/example/DiablodexApi/dto/CharacterDto.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/src/main/java/com/example/DiablodexApi/dto/CreateCharacterDto.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/src/main/java/com/example/DiablodexApi/dto/CreateItemDto.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/src/main/java/com/example/DiablodexApi/dto/ErrorResponse.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/src/main/java/com/example/DiablodexApi/dto/ItemDto.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/src/main/java/com/example/DiablodexApi/dto/PagedCharacterResponse.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/src/main/java/com/example/DiablodexApi/dto/UpdateCharacterDto.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/src/main/java/com/example/DiablodexApi/exception/CharacterAlreadyExistsException.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/src/main/java/com/example/DiablodexApi/exception/CharacterNotFoundException.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/src/main/java/com/example/DiablodexApi/exception/GlobalExceptionHandler.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/src/main/java/com/example/DiablodexApi/exception/GrpcServiceException.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/src/main/java/com/example/DiablodexApi/exception/ItemAlreadyExistsException.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/src/main/java/com/example/DiablodexApi/exception/ItemNotFoundException.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/src/main/java/com/example/DiablodexApi/exception/SoapServiceException.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/src/main/java/com/example/DiablodexApi/service/CharacterService.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/src/main/java/com/example/DiablodexApi/service/ItemService.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/target/generated-sources/protobuf/grpc-java/com/diablo/grpc/InventoryServiceGrpc.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/target/generated-sources/protobuf/java/com/diablo/grpc/BulkCreateResponse.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/target/generated-sources/protobuf/java/com/diablo/grpc/BulkCreateResponseOrBuilder.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/target/generated-sources/protobuf/java/com/diablo/grpc/CreateItemRequest.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/target/generated-sources/protobuf/java/com/diablo/grpc/CreateItemRequestOrBuilder.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/target/generated-sources/protobuf/java/com/diablo/grpc/GemType.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/target/generated-sources/protobuf/java/com/diablo/grpc/InventoryProto.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/target/generated-sources/protobuf/java/com/diablo/grpc/ItemRequest.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/target/generated-sources/protobuf/java/com/diablo/grpc/ItemRequestOrBuilder.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/target/generated-sources/protobuf/java/com/diablo/grpc/ItemResponse.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/target/generated-sources/protobuf/java/com/diablo/grpc/ItemResponseOrBuilder.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/target/generated-sources/protobuf/java/com/diablo/grpc/ItemType.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/target/generated-sources/protobuf/java/com/diablo/grpc/ItemTypeRequest.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/target/generated-sources/protobuf/java/com/diablo/grpc/ItemTypeRequestOrBuilder.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/target/generated-sources/xjc/com/example/DiablodexApi/soap/client/generated/CharacterClassEnum.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/target/generated-sources/xjc/com/example/DiablodexApi/soap/client/generated/CharacterDetails.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/target/generated-sources/xjc/com/example/DiablodexApi/soap/client/generated/CreateCharacterRequest.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/target/generated-sources/xjc/com/example/DiablodexApi/soap/client/generated/DeleteCharacterRequest.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/target/generated-sources/xjc/com/example/DiablodexApi/soap/client/generated/DeleteCharacterResponse.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/target/generated-sources/xjc/com/example/DiablodexApi/soap/client/generated/GetAllCharactersRequest.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/target/generated-sources/xjc/com/example/DiablodexApi/soap/client/generated/GetAllCharactersResponse.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/target/generated-sources/xjc/com/example/DiablodexApi/soap/client/generated/GetCharacterByIdRequest.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/target/generated-sources/xjc/com/example/DiablodexApi/soap/client/generated/GetCharacterByNameRequest.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/target/generated-sources/xjc/com/example/DiablodexApi/soap/client/generated/GetCharactersByClassRequest.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/target/generated-sources/xjc/com/example/DiablodexApi/soap/client/generated/GetCharactersByClassResponse.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/target/generated-sources/xjc/com/example/DiablodexApi/soap/client/generated/ObjectFactory.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/target/generated-sources/xjc/com/example/DiablodexApi/soap/client/generated/UpdateCharacterRequest.java
+/home/runner/work/SistemasDistribuidos_DCGS/SistemasDistribuidos_DCGS/DiablodexApi/target/generated-sources/xjc/com/example/DiablodexApi/soap/client/generated/package-info.java

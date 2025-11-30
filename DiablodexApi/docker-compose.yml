@@ -15,10 +15,44 @@ services:
       - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://localhost:4444
       - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=DEBUG
       - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY_OAUTH2=TRACE
+      - GRPC_CLIENT_WEAPONS_API_ADDRESS=static://weapons-api:50051
+      - GRPC_CLIENT_WEAPONS_API_NEGOTIATIONTYPE=PLAINTEXT
     depends_on:
       - diablo-api
       - redis
       - hydra
+      - weapons-api
+    networks:
+      - diablo-net
+
+  weapons-api:
+    build:
+      context: ../WeaponsApi
+    container_name: weapons-api
+    ports:
+      - "50051:50051"
+    environment:
+      - MONGO_URI=mongodb://weapons-mongo:27017
+      - MONGO_DB=diablo_weapons
+      - MONGO_COLLECTION=loot_items
+    depends_on:
+      weapons-mongo:
+        condition: service_healthy
+    networks:
+      - diablo-net
+
+  weapons-mongo:
+    image: mongo:7.0
+    container_name: weapons-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data_weapons:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
     networks:
       - diablo-net
 
@@ -113,6 +147,7 @@ services:
 volumes:
   mysql_data_diablo:
   postgres_data_hydra:
+  mongo_data_weapons:
 
 networks:
   diablo-net:

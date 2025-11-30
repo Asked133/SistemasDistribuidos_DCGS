@@ -1,0 +1,15 @@
+package com.example.DiablodexApi.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class BulkCreateResponseDto {
+    private int itemsCreados;
+    private String mensaje;
+}
