@@ -1,6 +1,7 @@
 import sys
 import os
 import time
+import uuid
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "protos"))
 
@@ -66,10 +67,14 @@ class InventoryService(diablo_inventory_pb2_grpc.InventoryServiceServicer):
     def CreateBulkLoot(self, request_iterator, context):
         count = 0
         for req in request_iterator:
-            self._validate_create_request(req, context)
+            # Auto-generate ID if not provided
+            item_id = req.id if req.id else str(uuid.uuid4())
+            
+            # Validate the request (with auto-generated ID)
+            self._validate_create_request(req, item_id, context)
 
             doc = {
-                "_id": req.id,
+                "_id": item_id,
                 "nombre": req.nombre,
                 "tipo": req.tipo,
                 "poder": req.poder_de_objeto,
@@ -78,16 +83,21 @@ class InventoryService(diablo_inventory_pb2_grpc.InventoryServiceServicer):
                 "gemas": list(req.gemas),
             }
 
+            # Auto-set dano/armadura based on type if not provided
             campo = req.WhichOneof('datos_propios')
             if campo == 'dano_base':
                 doc["dano"] = req.dano_base
             elif campo == 'armadura_base':
                 doc["armadura"] = req.armadura_base
+            elif req.tipo == diablo_inventory_pb2.ItemType.WEAPON:
+                doc["dano"] = 100  # Default damage for weapons
+            elif req.tipo == diablo_inventory_pb2.ItemType.ARMOR:
+                doc["armadura"] = 50  # Default armor for armor items
 
             try:
                 collection.insert_one(doc)
             except DuplicateKeyError:
-                context.abort(grpc.StatusCode.ALREADY_EXISTS, f"ID {req.id} ya existe")
+                context.abort(grpc.StatusCode.ALREADY_EXISTS, f"ID {item_id} ya existe")
 
             count += 1
 
@@ -96,9 +106,8 @@ class InventoryService(diablo_inventory_pb2_grpc.InventoryServiceServicer):
             mensaje="Loot masivo almacenado correctamente"
         )
 
-    def _validate_create_request(self, req, context):
-        if not req.id:
-            context.abort(grpc.StatusCode.INVALID_ARGUMENT, "ID es obligatorio")
+    def _validate_create_request(self, req, item_id, context):
+        # ID is now auto-generated if not provided, so no validation needed
         if not req.nombre:
             context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Nombre es obligatorio")
         if req.tipo == diablo_inventory_pb2.ItemType.UNKNOWN_TYPE:
@@ -107,9 +116,7 @@ class InventoryService(diablo_inventory_pb2_grpc.InventoryServiceServicer):
             context.abort(grpc.StatusCode.OUT_OF_RANGE, "Poder fuera de rango (0-1000)")
         if len(req.gemas) > 2:
             context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Maximo 2 gemas permitidas")
-        campo = req.WhichOneof('datos_propios')
-        if campo not in ('dano_base', 'armadura_base'):
-            context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Debe especificar dano o armadura")
+        # dano/armadura is now auto-set based on type if not provided, so no validation needed
 
     def _to_item_response(self, doc):
         resp = diablo_inventory_pb2.ItemResponse(
