@@ -5,8 +5,10 @@ import com.example.DiablodexApi.dto.BulkCreateResponseDto;
 import com.example.DiablodexApi.dto.CreateItemDto;
 import com.example.DiablodexApi.dto.ItemDto;
 import com.example.DiablodexApi.exception.GrpcServiceException;
+import com.example.DiablodexApi.exception.InvalidArgumentException;
 import com.example.DiablodexApi.exception.ItemAlreadyExistsException;
 import com.example.DiablodexApi.exception.ItemNotFoundException;
+import com.example.DiablodexApi.exception.OutOfRangeException;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -106,18 +109,28 @@ public class ItemService {
 
         try {
             for (CreateItemDto item : items) {
+                // Auto-generate ID if not provided
+                String itemId = (item.getId() != null && !item.getId().isBlank()) 
+                    ? item.getId() 
+                    : UUID.randomUUID().toString();
+                
+                ItemType itemType = parseItemType(item.getTipo());
+                
                 CreateItemRequest.Builder requestBuilder = CreateItemRequest.newBuilder()
-                        .setId(item.getId())
+                        .setId(itemId)
                         .setNombre(item.getNombre())
-                        .setTipo(parseItemType(item.getTipo()))
+                        .setTipo(itemType)
                         .setPoderDeObjeto(item.getPoderDeObjeto() != null ? item.getPoderDeObjeto() : 0)
                         .setHabilidadPasiva(item.getHabilidadPasiva() != null ? item.getHabilidadPasiva() : "")
                         .setHabilidadActiva(item.getHabilidadActiva() != null ? item.getHabilidadActiva() : "");
 
-                if (item.getDanoBase() != null) {
-                    requestBuilder.setDanoBase(item.getDanoBase());
-                } else if (item.getArmaduraBase() != null) {
-                    requestBuilder.setArmaduraBase(item.getArmaduraBase());
+                // Auto-set danoBase for WEAPON and armaduraBase for ARMOR
+                if (itemType == ItemType.WEAPON) {
+                    int dano = (item.getDanoBase() != null) ? item.getDanoBase() : 100; // Default damage
+                    requestBuilder.setDanoBase(dano);
+                } else if (itemType == ItemType.ARMOR) {
+                    int armadura = (item.getArmaduraBase() != null) ? item.getArmaduraBase() : 50; // Default armor
+                    requestBuilder.setArmaduraBase(armadura);
                 }
 
                 if (item.getGemas() != null) {
@@ -232,8 +245,8 @@ public class ItemService {
         switch (code) {
             case NOT_FOUND -> throw new ItemNotFoundException(description != null ? description : defaultMessage);
             case ALREADY_EXISTS -> throw new ItemAlreadyExistsException(description != null ? description : "Item already exists");
-            case INVALID_ARGUMENT -> throw new GrpcServiceException("Invalid argument: " + (description != null ? description : defaultMessage));
-            case OUT_OF_RANGE -> throw new GrpcServiceException("Out of range: " + (description != null ? description : defaultMessage));
+            case INVALID_ARGUMENT -> throw new InvalidArgumentException(description != null ? description : defaultMessage);
+            case OUT_OF_RANGE -> throw new OutOfRangeException(description != null ? description : defaultMessage);
             default -> log.error("gRPC error: {} - {}", code, description);
         }
     }

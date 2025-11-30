@@ -18,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CreateItemDto {
     
-    @NotBlank(message = "ID is required")
+    // ID is now optional - will be auto-generated if not provided
     private String id;
     
     @NotBlank(message = "Name is required")
@@ -31,6 +31,7 @@ public class CreateItemDto {
     @Max(value = 1000, message = "Power must be at most 1000")
     private Integer poderDeObjeto;
     
+    // danoBase and armaduraBase are now optional - will be auto-set based on type
     private Integer danoBase;
     private Integer armaduraBase;
     

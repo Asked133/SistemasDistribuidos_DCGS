@@ -70,6 +70,28 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(InvalidArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidArgumentException(InvalidArgumentException ex) {
+        ErrorResponse error = ErrorResponse.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .message("Invalid argument")
+                .details(ex.getMessage())
+                .timestamp(LocalDateTime.now().toString())
+                .build();
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(OutOfRangeException.class)
+    public ResponseEntity<ErrorResponse> handleOutOfRangeException(OutOfRangeException ex) {
+        ErrorResponse error = ErrorResponse.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .message("Value out of range")
+                .details(ex.getMessage())
+                .timestamp(LocalDateTime.now().toString())
+                .build();
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(GrpcServiceException.class)
     public ResponseEntity<ErrorResponse> handleGrpcServiceException(GrpcServiceException ex) {
         ErrorResponse error = ErrorResponse.builder()
