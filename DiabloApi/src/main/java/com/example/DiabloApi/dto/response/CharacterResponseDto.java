@@ -3,23 +3,37 @@ package com.example.DiabloApi.dto.response;
 import jakarta.xml.bind.annotation.*;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "CharacterDetails", namespace = "http://DiabloApi.example.com/characters", propOrder = {
-        "id", "name", "characterClass", "level", "power", "armor", "life",
-        "strength", "intelligence", "willpower", "dexterity", "message"
+@XmlType(name = "CharacterDetails", namespace = CharacterResponseDto.NAMESPACE_URI, propOrder = {
+    "id", "name", "characterClass", "level", "power", "armor", "life",
+    "strength", "intelligence", "willpower", "dexterity", "message"
 })
 public class CharacterResponseDto {
 
+    static final String NAMESPACE_URI = "http://DiabloApi.example.com/characters";
+
+    @XmlElement(namespace = NAMESPACE_URI)
     private String id;
+    @XmlElement(namespace = NAMESPACE_URI)
     private String name;
+    @XmlElement(namespace = NAMESPACE_URI)
     private String characterClass;
+    @XmlElement(namespace = NAMESPACE_URI)
     private Integer level;
+    @XmlElement(namespace = NAMESPACE_URI)
     private Integer power;
+    @XmlElement(namespace = NAMESPACE_URI)
     private Integer armor;
+    @XmlElement(namespace = NAMESPACE_URI)
     private Integer life;
+    @XmlElement(namespace = NAMESPACE_URI)
     private Integer strength;
+    @XmlElement(namespace = NAMESPACE_URI)
     private Integer intelligence;
+    @XmlElement(namespace = NAMESPACE_URI)
     private Integer willpower;
+    @XmlElement(namespace = NAMESPACE_URI)
     private Integer dexterity;
+    @XmlElement(namespace = NAMESPACE_URI)
     private String message;
 
     public CharacterResponseDto() {
