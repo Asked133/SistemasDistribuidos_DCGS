@@ -20,13 +20,17 @@ MONGO_COLLECTION = os.getenv("MONGO_COLLECTION", "loot_items")
 
 mongo_client = MongoClient(MONGO_URI)
 collection = mongo_client[MONGO_DB][MONGO_COLLECTION]
-collection.create_index("tipo")
+
+# Create index if it doesn't exist (using background to avoid blocking)
+existing_indexes = [idx['key'] for idx in collection.list_indexes()]
+if [('tipo', 1)] not in existing_indexes:
+    collection.create_index("tipo", background=True)
 
 class InventoryService(diablo_inventory_pb2_grpc.InventoryServiceServicer):
 
     def GetItem(self, request, context):
         if not request.id:
-            context.abort(grpc.StatusCode.INVALID_ARGUMENT, "El ID es obligatorio")
+            context.abort(grpc.StatusCode.INVALID_ARGUMENT, "ID es obligatorio")
 
         doc = collection.find_one({"_id": request.id})
         if not doc:
@@ -36,7 +40,7 @@ class InventoryService(diablo_inventory_pb2_grpc.InventoryServiceServicer):
 
     def ListItemsByType(self, request, context):
         if request.tipo == diablo_inventory_pb2.ItemType.UNKNOWN_TYPE:
-            context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Tipo requerido")
+            context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Tipo es obligatorio")
 
         cursor = collection.find({"tipo": request.tipo})
         for doc in cursor:
@@ -60,7 +64,7 @@ class InventoryService(diablo_inventory_pb2_grpc.InventoryServiceServicer):
             campo = req.WhichOneof('datos_propios')
             if campo == 'dano_base':
                 doc["dano"] = req.dano_base
-            else:
+            elif campo == 'armadura_base':
                 doc["armadura"] = req.armadura_base
 
             try:
@@ -72,23 +76,23 @@ class InventoryService(diablo_inventory_pb2_grpc.InventoryServiceServicer):
 
         return diablo_inventory_pb2.BulkCreateResponse(
             items_creados=count,
-            mensaje="Loot masivo almacenado"
+            mensaje="Loot masivo almacenado correctamente"
         )
 
     def _validate_create_request(self, req, context):
         if not req.id:
-            context.abort(grpc.StatusCode.INVALID_ARGUMENT, "ID obligatorio")
+            context.abort(grpc.StatusCode.INVALID_ARGUMENT, "ID es obligatorio")
         if not req.nombre:
-            context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Nombre obligatorio")
+            context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Nombre es obligatorio")
         if req.tipo == diablo_inventory_pb2.ItemType.UNKNOWN_TYPE:
-            context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Tipo invalido")
+            context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Tipo es invalido")
         if not (0 <= req.poder_de_objeto <= 1000):
             context.abort(grpc.StatusCode.OUT_OF_RANGE, "Poder fuera de rango (0-1000)")
         if len(req.gemas) > 2:
-            context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Maximo 2 gemas")
+            context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Maximo 2 gemas permitidas")
         campo = req.WhichOneof('datos_propios')
         if campo not in ('dano_base', 'armadura_base'):
-            context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Debe especificar daño o armadura")
+            context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Debe especificar dano o armadura")
 
     def _to_item_response(self, doc):
         resp = diablo_inventory_pb2.ItemResponse(
@@ -112,7 +116,7 @@ def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     diablo_inventory_pb2_grpc.add_InventoryServiceServicer_to_server(InventoryService(), server)
     server.add_insecure_port('[::]:50051')
-    print("Servidor gRPC WeaponsApi escuchando en 50051...")
+    print("Servidor gRPC WeaponsApi escuchando en puerto 50051...")
     server.start()
     server.wait_for_termination()
 
