@@ -1,12 +1,13 @@
 import sys
 import os
+import time
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "protos"))
 
 import grpc
 from concurrent import futures
 from pymongo import MongoClient
-from pymongo.errors import DuplicateKeyError
+from pymongo.errors import DuplicateKeyError, ServerSelectionTimeoutError
 from dotenv import load_dotenv
 
 import diablo_inventory_pb2
@@ -18,13 +19,29 @@ MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
 MONGO_DB = os.getenv("MONGO_DB", "diablo_weapons")
 MONGO_COLLECTION = os.getenv("MONGO_COLLECTION", "loot_items")
 
-mongo_client = MongoClient(MONGO_URI)
-collection = mongo_client[MONGO_DB][MONGO_COLLECTION]
+# Retry connection to MongoDB
+def get_mongo_collection(max_retries=10, delay=2):
+    for attempt in range(max_retries):
+        try:
+            mongo_client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
+            # Test connection
+            mongo_client.admin.command('ping')
+            db = mongo_client[MONGO_DB]
+            coll = db[MONGO_COLLECTION]
+            # Create index if it doesn't exist
+            existing_indexes = [idx['key'] for idx in coll.list_indexes()]
+            if [('tipo', 1)] not in existing_indexes:
+                coll.create_index("tipo", background=True)
+            print(f"Connected to MongoDB successfully on attempt {attempt + 1}")
+            return coll
+        except ServerSelectionTimeoutError as e:
+            print(f"MongoDB connection attempt {attempt + 1}/{max_retries} failed: {e}")
+            if attempt < max_retries - 1:
+                time.sleep(delay)
+            else:
+                raise
 
-# Create index if it doesn't exist (using background to avoid blocking)
-existing_indexes = [idx['key'] for idx in collection.list_indexes()]
-if [('tipo', 1)] not in existing_indexes:
-    collection.create_index("tipo", background=True)
+collection = None
 
 class InventoryService(diablo_inventory_pb2_grpc.InventoryServiceServicer):
 
@@ -113,6 +130,9 @@ class InventoryService(diablo_inventory_pb2_grpc.InventoryServiceServicer):
         return resp
 
 def serve():
+    global collection
+    collection = get_mongo_collection()
+    
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     diablo_inventory_pb2_grpc.add_InventoryServiceServicer_to_server(InventoryService(), server)
     server.add_insecure_port('[::]:50051')

@@ -18,10 +18,14 @@ services:
       - GRPC_CLIENT_WEAPONSAPI_ADDRESS=static://weapons-api:50051
       - GRPC_CLIENT_WEAPONSAPI_NEGOTIATIONTYPE=PLAINTEXT
     depends_on:
-      - diablo-api
-      - redis
-      - hydra
-      - weapons-api
+      diablo-api:
+        condition: service_started
+      redis:
+        condition: service_started
+      hydra:
+        condition: service_started
+      weapons-api:
+        condition: service_healthy
     networks:
       - diablo-net
 
@@ -38,6 +42,12 @@ services:
     depends_on:
       weapons-mongo:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; s = socket.socket(socket.AF_INET, socket.SOCK_STREAM); s.connect(('localhost', 50051)); s.close()"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
     networks:
       - diablo-net
 
