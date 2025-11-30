@@ -28,10 +28,10 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ItemService {
 
-    @GrpcClient("weapons-api")
+    @GrpcClient("weaponsApi")
     private InventoryServiceGrpc.InventoryServiceBlockingStub blockingStub;
 
-    @GrpcClient("weapons-api")
+    @GrpcClient("weaponsApi")
     private InventoryServiceGrpc.InventoryServiceStub asyncStub;
 
     @Cacheable(value = "items", key = "#id")
