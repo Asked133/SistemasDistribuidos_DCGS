@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  weapons-api:
+    build: .
+    container_name: weapons-api
+    ports:
+      - "50051:50051"
+    environment:
+      - MONGO_URI=mongodb://weapons-mongo:27017
+      - MONGO_DB=diablo_weapons
+      - MONGO_COLLECTION=loot_items
+    depends_on:
+      weapons-mongo:
+        condition: service_healthy
+    networks:
+      - weapons-net
+
+  weapons-mongo:
+    image: mongo:7.0
+    container_name: weapons-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data_weapons:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    networks:
+      - weapons-net
+
+volumes:
+  mongo_data_weapons:
+
+networks:
+  weapons-net:
+    driver: bridge

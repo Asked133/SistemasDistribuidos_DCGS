@@ -412,6 +412,81 @@
           }
         }
       ]
+    },
+    {
+      "name": "Items (gRPC-backed)",
+      "item": [
+        {
+          "name": "Get Item by ID (Unary)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/items/{{item_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "items", "{{item_id}}"]
+            },
+            "description": "Invoca el Unary gRPC GetItem vía REST. Requiere scope 'read'."
+          }
+        },
+        {
+          "name": "Get Items by Type (Server Streaming)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/items/type/WEAPON",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "items", "type", "WEAPON"]
+            },
+            "description": "Consume el stream de items filtrado por tipo (gRPC server streaming)."
+          }
+        },
+        {
+          "name": "Create Bulk Items (Client Streaming)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"name\": \"Inferno Sword\",\n    \"type\": \"WEAPON\",\n    \"power\": 950,\n    \"damage\": 120,\n    \"passiveSkill\": \"Burning Rage\",\n    \"activeSkill\": \"Meteor Strike\",\n    \"gems\": [\"RUBI\", \"AMATISTA\"]\n  },\n  {\n    \"name\": \"Glacial Armor\",\n    \"type\": \"ARMOR\",\n    \"power\": 720,\n    \"defense\": 850,\n    \"passiveSkill\": \"Frozen Aegis\",\n    \"activeSkill\": \"Ice Nova\",\n    \"gems\": [\"ZAFIRO\"]\n  }\n]"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/items/bulk",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "items", "bulk"]
+            },
+            "description": "Ejemplo exitoso del client streaming CreateBulkLoot (requiere scope 'write')."
+          }
+        },
+        {
+          "name": "Create Bulk Items - Validation Error",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"name\": \"Broken Relic\",\n    \"type\": \"WEAPON\",\n    \"power\": 1501,\n    \"damage\": 10\n  }\n]"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/items/bulk",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "items", "bulk"]
+            },
+            "description": "Provoca un error 400 (OUT_OF_RANGE) para capturas de validación."
+          }
+        }
+      ]
     }
   ],
   "variable": [
@@ -422,7 +497,11 @@
     },
     {
       "key": "hydra_token_url",
-      "value": "http://localhost:4444/oauth2/token",
+      "value": "http://localhost:4444/oauth2/token"
+    },
+    {
+      "key": "item_id",
+      "value": "",
       "type": "string"
     },
     {
