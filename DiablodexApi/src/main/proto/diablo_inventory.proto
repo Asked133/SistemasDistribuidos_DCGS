@@ -58,6 +58,7 @@ message ItemResponse {
 message BulkCreateResponse {
     int32 items_creados = 1;
     string mensaje = 2;
+    repeated ItemResponse items = 3;
 }
 
 enum ItemType {

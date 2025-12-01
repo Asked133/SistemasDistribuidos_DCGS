@@ -66,6 +66,8 @@ class InventoryService(diablo_inventory_pb2_grpc.InventoryServiceServicer):
 
     def CreateBulkLoot(self, request_iterator, context):
         count = 0
+        created_items = []
+        
         for req in request_iterator:
             # Auto-generate ID if not provided
             item_id = req.id if req.id else str(uuid.uuid4())
@@ -96,6 +98,7 @@ class InventoryService(diablo_inventory_pb2_grpc.InventoryServiceServicer):
 
             try:
                 collection.insert_one(doc)
+                created_items.append(self._to_item_response(doc))
             except DuplicateKeyError:
                 context.abort(grpc.StatusCode.ALREADY_EXISTS, f"ID {item_id} ya existe")
 
@@ -103,7 +106,8 @@ class InventoryService(diablo_inventory_pb2_grpc.InventoryServiceServicer):
 
         return diablo_inventory_pb2.BulkCreateResponse(
             items_creados=count,
-            mensaje="Loot masivo almacenado correctamente"
+            mensaje="Loot masivo almacenado correctamente",
+            items=created_items
         )
 
     def _validate_create_request(self, req, item_id, context):

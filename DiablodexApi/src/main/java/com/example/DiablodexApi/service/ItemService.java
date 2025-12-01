@@ -168,9 +168,15 @@ public class ItemService {
         BulkCreateResponse response = responseRef.get();
         log.info("Successfully created {} items", response.getItemsCreados());
         
+        // Map the created items from the response
+        List<ItemDto> createdItems = response.getItemsList().stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+        
         return BulkCreateResponseDto.builder()
                 .itemsCreados(response.getItemsCreados())
                 .mensaje(response.getMensaje())
+                .items(createdItems)
                 .build();
     }
 

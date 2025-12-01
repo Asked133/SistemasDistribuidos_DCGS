@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -80,7 +79,26 @@ public class ItemController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<BulkCreateResponseDto> createBulkItems(
-            @Valid @RequestBody List<CreateItemDto> items) {
+            @RequestBody List<CreateItemDto> items) {
+        // Manual validation for list items
+        if (items == null || items.isEmpty()) {
+            throw new com.example.DiablodexApi.exception.InvalidArgumentException("At least one item is required");
+        }
+        for (int i = 0; i < items.size(); i++) {
+            CreateItemDto item = items.get(i);
+            if (item.getNombre() == null || item.getNombre().isBlank()) {
+                throw new com.example.DiablodexApi.exception.InvalidArgumentException("Item " + (i+1) + ": Name is required");
+            }
+            if (item.getTipo() == null || item.getTipo().isBlank()) {
+                throw new com.example.DiablodexApi.exception.InvalidArgumentException("Item " + (i+1) + ": Type is required");
+            }
+            if (item.getPoderDeObjeto() != null && (item.getPoderDeObjeto() < 0 || item.getPoderDeObjeto() > 1000)) {
+                throw new com.example.DiablodexApi.exception.InvalidArgumentException("Item " + (i+1) + ": Power must be between 0 and 1000");
+            }
+            if (item.getGemas() != null && item.getGemas().size() > 2) {
+                throw new com.example.DiablodexApi.exception.InvalidArgumentException("Item " + (i+1) + ": Maximum 2 gems allowed");
+            }
+        }
         BulkCreateResponseDto response = itemService.createBulkItems(items);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
