@@ -166,3 +166,53 @@ podman-compose up -d --build
 - OAuth2 obligatorio
 - Swagger UI disponible
 - DiabloApi (SOAP) requerido
+
+## Weapons gRPC Service (Python)
+
+- Servicio gRPC escrito en **Python 3.11** (carpeta `../WeaponsApi`) que gestiona loot en MongoDB 7; se levanta automáticamente con `docker-compose up --build` desde esta carpeta.
+- Reúne los tres tipos de RPC requeridos del archivo `src/main/proto/diablo_inventory.proto` y usa una base de datos distinta al SOAP (`MySQL` para `DiabloApi`, `MongoDB` para `WeaponsApi`).
+- Incluye Dockerfile, docker-compose y script `scripts/init-db.js` (ejecutar con `mongosh mongodb://localhost:27017 < scripts/init-db.js`) para crear colección `loot_items`, validaciones JSON Schema e índices (`tipo`).
+- Validaciones principales devuelven `StatusCode` gRPC: `INVALID_ARGUMENT` (campos obligatorios, rango poder 1-1000, máx. 2 gemas, tipo específico requiere daño/armadura), `ALREADY_EXISTS` (IDs duplicados), `NOT_FOUND` (item inexistente), `OUT_OF_RANGE` (poder fuera de rango).
+
+### RPC expuestos
+
+| Tipo | Método | Descripción |
+| --- | --- | --- |
+| Unary | `GetItem` | Obtiene un item por ID. |
+| Server streaming | `ListItemsByType` | Devuelve flujo de items filtrado por tipo `WEAPON`/`ARMOR`. |
+| Client streaming | `CreateBulkLoot` | Inserta múltiples items en una sola conexión, reutilizada por la REST API para creaciones masivas. |
+
+Fragmento del `.proto` (mismos mensajes/enums que usa el cliente Java):
+
+```proto
+service InventoryService {
+  rpc GetItem (ItemRequest) returns (ItemResponse);
+  rpc ListItemsByType (ItemTypeRequest) returns (stream ItemResponse);
+  rpc CreateBulkLoot (stream CreateItemRequest) returns (BulkCreateResponse);
+}
+```
+
+### REST → gRPC
+
+`ItemService.java` declara `@GrpcClient("weaponsApi")` con `InventoryServiceGrpc` para invocar el servicio:
+
+```java
+ItemResponse response = blockingStub.getItem(ItemRequest.newBuilder().setId(id).build());
+StreamObserver<CreateItemRequest> observer = asyncStub.createBulkLoot(responseObserver);
+```
+
+La endpoint REST `/api/v1/items` reutiliza estas llamadas para dar visibilidad a los flujos Unary/Streaming y propagar los códigos de error.
+
+### Pruebas rápidas
+
+1. Arranca todo con `docker-compose up --build`.
+2. Crea cliente OAuth2 en Hydra y usa el token para invocar REST:
+  - `POST /api/v1/items/bulk` → dispara client streaming.
+  - `GET /api/v1/items/type/{tipo}` → server streaming.
+  - `GET /api/v1/items/{id}` → unary.
+3. Prueba el gRPC directamente (sin REST) con `grpcurl`:
+  ```bash
+  grpcurl -plaintext -d '{"id":"sample-weapon-001"}' localhost:50051 diablopb.InventoryService/GetItem
+  grpcurl -plaintext -d '{"tipo":1}' localhost:50051 diablopb.InventoryService/ListItemsByType
+  ```
+4. Para poblar Mongo manualmente o resetear validaciones: `mongosh mongodb://localhost:27017 < scripts/init-db.js` dentro de `../WeaponsApi`.

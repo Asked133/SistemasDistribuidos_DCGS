@@ -15,10 +15,57 @@ services:
       - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://localhost:4444
       - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=DEBUG
       - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY_OAUTH2=TRACE
+      - GRPC_CLIENT_WEAPONSAPI_ADDRESS=dns:///weapons-api:50051
+      - GRPC_CLIENT_WEAPONSAPI_NEGOTIATION_TYPE=PLAINTEXT
+      - GRPC_CLIENT_WEAPONSAPI_ENABLE_KEEP_ALIVE=true
+      - GRPC_CLIENT_WEAPONSAPI_KEEP_ALIVE_TIME=30s
+      - GRPC_CLIENT_WEAPONSAPI_KEEP_ALIVE_TIMEOUT=10s
     depends_on:
-      - diablo-api
-      - redis
-      - hydra
+      diablo-api:
+        condition: service_started
+      redis:
+        condition: service_started
+      hydra:
+        condition: service_started
+      weapons-api:
+        condition: service_healthy
+    networks:
+      - diablo-net
+
+  weapons-api:
+    build:
+      context: ../WeaponsApi
+    container_name: weapons-api
+    ports:
+      - "50051:50051"
+    environment:
+      - MONGO_URI=mongodb://weapons-mongo:27017
+      - MONGO_DB=diablo_weapons
+      - MONGO_COLLECTION=loot_items
+    depends_on:
+      weapons-mongo:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; s = socket.socket(socket.AF_INET, socket.SOCK_STREAM); s.connect(('localhost', 50051)); s.close()"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+    networks:
+      - diablo-net
+
+  weapons-mongo:
+    image: mongo:7.0
+    container_name: weapons-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data_weapons:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
     networks:
       - diablo-net
 
@@ -113,6 +160,7 @@ services:
 volumes:
   mysql_data_diablo:
   postgres_data_hydra:
+  mongo_data_weapons:
 
 networks:
   diablo-net:

@@ -35,19 +35,10 @@ public class CharacterService {
             GetCharacterByIdRequest request = objectFactory.createGetCharacterByIdRequest();
             request.setId(id);
 
-            Object responseObj = webServiceTemplate.marshalSendAndReceive(request);
-            CharacterDetails details;
-            
-            if (responseObj instanceof JAXBElement) {
-                @SuppressWarnings("unchecked")
-                JAXBElement<CharacterDetails> jaxbElement = (JAXBElement<CharacterDetails>) responseObj;
-                details = jaxbElement.getValue();
-            } else if (responseObj instanceof CharacterDetails) {
-                details = (CharacterDetails) responseObj;
-            } else {
-                throw new SoapServiceException("Unexpected SOAP response type: " + responseObj.getClass().getName());
-            }
-            
+            CharacterDetails details = extractCharacterDetails(
+                webServiceTemplate.marshalSendAndReceive(request)
+            );
+            validateCharacterResponse(details, "Character with id " + id + " not found", true);
             log.info("Successfully fetched character, mapping to DTO...");
             CharacterDto dto = mapToDto(details);
             log.info("DTO created successfully, returning response for character: {}", dto.getName());
@@ -70,19 +61,22 @@ public class CharacterService {
 
             // The SOAP service returns the response object directly, not wrapped in JAXBElement
             Object responseObj = webServiceTemplate.marshalSendAndReceive(request);
-            GetAllCharactersResponse allResponse;
-            
-            if (responseObj instanceof JAXBElement) {
-                @SuppressWarnings("unchecked")
-                JAXBElement<GetAllCharactersResponse> jaxbElement = (JAXBElement<GetAllCharactersResponse>) responseObj;
-                allResponse = jaxbElement.getValue();
-            } else if (responseObj instanceof GetAllCharactersResponse) {
-                allResponse = (GetAllCharactersResponse) responseObj;
+            List<CharacterDetails> allCharacters;
+            Integer soapTotalPages = null;
+            Long soapTotalElements = null;
+
+            if (responseObj instanceof JAXBElement<?> jaxbElement) {
+                Object value = jaxbElement.getValue();
+                SoapListPayload payload = unwrapListPayload(value);
+                allCharacters = payload.characters();
+                soapTotalElements = payload.totalElements();
+                soapTotalPages = payload.totalPages();
             } else {
-                throw new SoapServiceException("Unexpected SOAP response type: " + responseObj.getClass().getName());
+                SoapListPayload payload = unwrapListPayload(responseObj);
+                allCharacters = payload.characters();
+                soapTotalElements = payload.totalElements();
+                soapTotalPages = payload.totalPages();
             }
-            
-            List<CharacterDetails> allCharacters = allResponse.getCharacters();
 
             // Filter by class if specified
             List<CharacterDetails> filtered = allCharacters;
@@ -122,8 +116,8 @@ public class CharacterService {
                 .characters(dtos)
                 .page(page)
                 .pageSize(size)
-                .totalElements(totalElements)
-                .totalPages(totalPages)
+                .totalElements(soapTotalElements != null ? soapTotalElements.intValue() : totalElements)
+                .totalPages(soapTotalPages != null ? soapTotalPages : totalPages)
                 .build();
             log.info("Response built successfully, returning {} characters", dtos.size());
             return response;
@@ -153,19 +147,13 @@ public class CharacterService {
             soapRequest.setWillpower(request.getWillpower());
             soapRequest.setDexterity(request.getDexterity());
 
-            Object responseObj = webServiceTemplate.marshalSendAndReceive(soapRequest);
-            CharacterDetails details;
-            
-            if (responseObj instanceof JAXBElement) {
-                @SuppressWarnings("unchecked")
-                JAXBElement<CharacterDetails> jaxbElement = (JAXBElement<CharacterDetails>) responseObj;
-                details = jaxbElement.getValue();
-            } else if (responseObj instanceof CharacterDetails) {
-                details = (CharacterDetails) responseObj;
-            } else {
-                throw new SoapServiceException("Unexpected SOAP response type: " + responseObj.getClass().getName());
-            }
-            
+            CharacterDetails details = ensureCharacterExists(
+                extractCharacterDetails(webServiceTemplate.marshalSendAndReceive(soapRequest)),
+                null,
+                request.getName()
+            );
+
+            validateCharacterResponse(details, "Failed to create character " + request.getName(), false);
             log.info("Character created successfully with id: {}", details.getId());
             return mapToDto(details);
         } catch (Exception e) {
@@ -198,19 +186,13 @@ public class CharacterService {
             soapRequest.setWillpower(request.getWillpower());
             soapRequest.setDexterity(request.getDexterity());
 
-            Object responseObj = webServiceTemplate.marshalSendAndReceive(soapRequest);
-            CharacterDetails details;
-            
-            if (responseObj instanceof JAXBElement) {
-                @SuppressWarnings("unchecked")
-                JAXBElement<CharacterDetails> jaxbElement = (JAXBElement<CharacterDetails>) responseObj;
-                details = jaxbElement.getValue();
-            } else if (responseObj instanceof CharacterDetails) {
-                details = (CharacterDetails) responseObj;
-            } else {
-                throw new SoapServiceException("Unexpected SOAP response type: " + responseObj.getClass().getName());
-            }
-            
+            CharacterDetails details = ensureCharacterExists(
+                extractCharacterDetails(webServiceTemplate.marshalSendAndReceive(soapRequest)),
+                id,
+                request.getName()
+            );
+
+            validateCharacterResponse(details, "Failed to update character " + id, true);
             log.info("Character updated successfully: {}", id);
             return mapToDto(details);
         } catch (Exception e) {
@@ -245,19 +227,13 @@ public class CharacterService {
             if (request.getWillpower() != null) soapRequest.setWillpower(request.getWillpower());
             if (request.getDexterity() != null) soapRequest.setDexterity(request.getDexterity());
 
-            Object responseObj = webServiceTemplate.marshalSendAndReceive(soapRequest);
-            CharacterDetails details;
-            
-            if (responseObj instanceof JAXBElement) {
-                @SuppressWarnings("unchecked")
-                JAXBElement<CharacterDetails> jaxbElement = (JAXBElement<CharacterDetails>) responseObj;
-                details = jaxbElement.getValue();
-            } else if (responseObj instanceof CharacterDetails) {
-                details = (CharacterDetails) responseObj;
-            } else {
-                throw new SoapServiceException("Unexpected SOAP response type: " + responseObj.getClass().getName());
-            }
-            
+            CharacterDetails details = ensureCharacterExists(
+                extractCharacterDetails(webServiceTemplate.marshalSendAndReceive(soapRequest)),
+                id,
+                request.getName()
+            );
+
+            validateCharacterResponse(details, "Failed to update character " + id, true);
             log.info("Character patched successfully: {}", id);
             return mapToDto(details);
         } catch (Exception e) {
@@ -303,6 +279,40 @@ public class CharacterService {
         }
     }
 
+    private void validateCharacterResponse(CharacterDetails details, String defaultMessage, boolean notFoundOnEmpty) {
+        if (details != null) {
+            log.debug("SOAP payload received - id: {}, name: {}, message: {}", details.getId(), details.getName(), details.getMessage());
+        } else {
+            log.debug("SOAP payload received is null for context: {}", defaultMessage);
+        }
+        if (details == null) {
+            if (notFoundOnEmpty) {
+                throw new CharacterNotFoundException(defaultMessage);
+            }
+            throw new SoapServiceException(defaultMessage);
+        }
+
+        if (hasIdentity(details)) {
+            return;
+        }
+
+        String message = details.getMessage();
+        if (message != null) {
+            String normalized = message.toLowerCase();
+            if (normalized.contains("not found")) {
+                throw new CharacterNotFoundException(message);
+            }
+            if (normalized.contains("already exists") || normalized.contains("unique")) {
+                throw new CharacterAlreadyExistsException(message);
+            }
+        }
+
+        if (notFoundOnEmpty) {
+            throw new CharacterNotFoundException(defaultMessage);
+        }
+        throw new SoapServiceException(message != null ? message : defaultMessage);
+    }
+
     private CharacterDto mapToDto(CharacterDetails details) {
         return CharacterDto.builder()
             .id(details.getId())
@@ -331,4 +341,80 @@ public class CharacterService {
             default -> null;
         };
     }
+
+    private SoapListPayload unwrapListPayload(Object value) {
+        if (value instanceof GetAllCharactersResponse paged) {
+            return new SoapListPayload(paged.getCharacters(), paged.getTotalElements(), paged.getTotalPages());
+        }
+        if (value instanceof GetCharactersByClassResponse byClass) {
+            return new SoapListPayload(byClass.getCharacters(), null, null);
+        }
+        throw new SoapServiceException("Unexpected SOAP response type: " + value.getClass().getName());
+    }
+
+    private boolean hasIdentity(CharacterDetails details) {
+        return details != null && details.getId() != null && details.getName() != null;
+    }
+
+    private CharacterDetails ensureCharacterExists(CharacterDetails details, String id, String name) {
+        if (hasIdentity(details)) {
+            return details;
+        }
+
+        log.warn("SOAP response missing identifying data (id: {}, name: {}), running fallback lookup", id, name);
+        CharacterDetails resolved = null;
+        if (id != null && !id.isBlank()) {
+            resolved = fetchCharacterById(id);
+        }
+        if (!hasIdentity(resolved) && name != null && !name.isBlank()) {
+            resolved = fetchCharacterByName(name);
+        }
+
+        return resolved != null ? resolved : details;
+    }
+
+    private CharacterDetails fetchCharacterByName(String name) {
+        if (name == null || name.isBlank()) {
+            return null;
+        }
+        try {
+            GetCharacterByNameRequest lookup = objectFactory.createGetCharacterByNameRequest();
+            lookup.setName(name);
+            return extractCharacterDetails(webServiceTemplate.marshalSendAndReceive(lookup));
+        } catch (Exception ex) {
+            log.error("Fallback lookup by name failed for {}", name, ex);
+            return null;
+        }
+    }
+
+    private CharacterDetails fetchCharacterById(String id) {
+        if (id == null || id.isBlank()) {
+            return null;
+        }
+        try {
+            GetCharacterByIdRequest lookup = objectFactory.createGetCharacterByIdRequest();
+            lookup.setId(id);
+            return extractCharacterDetails(webServiceTemplate.marshalSendAndReceive(lookup));
+        } catch (Exception ex) {
+            log.error("Fallback lookup by id failed for {}", id, ex);
+            return null;
+        }
+    }
+
+    private CharacterDetails extractCharacterDetails(Object responseObj) {
+        if (responseObj instanceof JAXBElement<?> jaxbElement) {
+            Object value = jaxbElement.getValue();
+            if (value instanceof CharacterDetails details) {
+                return details;
+            }
+        } else if (responseObj instanceof CharacterDetails details) {
+            return details;
+        }
+        if (responseObj == null) {
+            return null;
+        }
+        throw new SoapServiceException("Unexpected SOAP response type: " + responseObj.getClass().getName());
+    }
+
+    private record SoapListPayload(List<CharacterDetails> characters, Long totalElements, Integer totalPages) {}
 }
