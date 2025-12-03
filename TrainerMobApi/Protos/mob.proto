@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package mobpb;
+
+option csharp_namespace = "TrainerMobApi";
+
+import "google/protobuf/timestamp.proto";
+
+service MobService {
+    rpc CreateMobs (stream CreateMobRequest) returns (CreateMobsResponse);
+}
+
+enum DropRarityProto {
+    UNKNOWN = 0;
+    GUARANTEED = 1;
+    COMMON = 2;
+    UNCOMMON = 3;
+    RARE = 4;
+}
+
+message MobDropProto {
+    string item_name = 1;
+    DropRarityProto rarity = 2;
+}
+
+
+
+message MobStatsProto {
+    int32 attack = 1;
+    int32 speed = 2;
+    int32 hp = 3;
+}
+
+message CreateMobRequest {
+    string name = 1;
+    string type = 2;
+    string behavior = 3;
+    MobStatsProto stats = 4;
+    repeated MobDropProto drops = 5; 
+}
+
+message CreateMobsResponse {
+    int32 successCount = 1;
+    repeated MobResponse mobs = 2;
+}
+
+message MobResponse {
+    string id = 1;
+    string name = 2;
+    string type = 3;
+    string behavior = 4;
+    MobStatsProto stats = 5;
+    google.protobuf.Timestamp createdAt = 6;
+    repeated MobDropProto drops = 7; 
+}
