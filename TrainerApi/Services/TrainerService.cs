@@ -11,9 +11,8 @@ namespace TrainerApi.Services;
 public class TrainerService : TrainerApi.TrainerService.TrainerServiceBase
 {
     private readonly ITrainerRepository _trainerRepository;
-    private readonly IMessageBrokerProducer _producer;
     private static int LegalMexicanAge = 18;
-    public TrainerService(ITrainerRepository trainerRepository, IMessageBrokerProducer producer)
+    public TrainerService(ITrainerRepository trainerRepository)
     {
         _trainerRepository = trainerRepository;
         _producer = producer;
@@ -89,23 +88,6 @@ public class TrainerService : TrainerApi.TrainerService.TrainerServiceBase
         if (trainerAlreadyExists)
             throw new RpcException(new Status(StatusCode.AlreadyExists, "A trainer already exists."));
         await _trainerRepository.UpdateAsync(trainer, context.CancellationToken);
-
-        var ev = new TrainerUpdatedEvent
-        {
-            Id = trainer.Id,
-            Name = trainer.Name,
-            Age = trainer.Age,
-            Birthdate = trainer.Birthdate,
-            CreatedAt = trainer.CreatedAt,
-            Medals = trainer.Medals.Select(m => new MedalEvent
-            {
-                Region = m.Region,
-                Type = m.Type.ToString()
-            }).ToList()
-        };
-
-        await _producer.ProduceAsync(ev, cancellationToken: context.CancellationToken);
-
         return new Empty();
     }
 
@@ -116,16 +98,6 @@ public class TrainerService : TrainerApi.TrainerService.TrainerServiceBase
 
         var trainer = await GetTrainerAsync(request.Id, context.CancellationToken);
         await _trainerRepository.DeleteAsync(request.Id, context.CancellationToken);
-
-        var ev = new TrainerDeletedEvent
-        {
-            Id = trainer.Id,
-            Name = trainer.Name,
-            DeletedAt = DateTime.UtcNow,
-        };   
-
-        await _producer.ProduceAsync(ev, context.CancellationToken);
-
         return new Empty();
     }
     public override async Task GetAllTrainersByName(TrainersByNameRequest request, IServerStreamWriter<TrainerResponse> responseStream, ServerCallContext context)
