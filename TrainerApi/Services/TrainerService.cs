@@ -1,9 +1,10 @@
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
-using TrainerApi.Infrastructure.Documents;
 using TrainerApi.Mappers;
 using TrainerApi.Models;
 using TrainerApi.Repositories;
+using TrainerApi.Events;
+using TrainerApi.Infrastructure.Producers;
 
 namespace TrainerApi.Services;
 
@@ -14,7 +15,7 @@ public class TrainerService : TrainerApi.TrainerService.TrainerServiceBase
     public TrainerService(ITrainerRepository trainerRepository)
     {
         _trainerRepository = trainerRepository;
-
+        _producer = producer;
     }
     public override async Task<TrainerResponse> GetTrainerById(TrainerByIdRequest request, ServerCallContext context)
     {
@@ -41,7 +42,23 @@ public class TrainerService : TrainerApi.TrainerService.TrainerServiceBase
 
             var createdTrainer = await _trainerRepository.CreateAsync(trainer, context.CancellationToken);
             createdTrainers.Add(createdTrainer.ToResponse());
-        }
+
+            var ev = new TrainerCreatedEvent
+            {
+                Id = createdTrainer.Id,
+                Name = createdTrainer.Name,
+                Age = createdTrainer.Age,
+                Birthdate = createdTrainer.Birthdate,
+                CreatedAt = createdTrainer.CreatedAt,
+                Medals = createdTrainer.Medals.Select(s => new MedalEvent
+                {
+                    Region = s.Region,
+                    Type = s.Type.ToString()
+                }).ToList()
+        };
+
+        await _producer.ProduceAsync(ev, cancellationToken: context.CancellationToken);
+    }
 
         return new CreateTrainerResponse
         {
