@@ -60,4 +60,82 @@ public class CharacterService {
     public List<Character> findByCharacterClass(CharacterClass characterClass) {
         return characterRepository.findByCharacterClass(characterClass);
     }
+
+    // Metodo para obtener todos los personajes
+    public List<Character> findAll() {
+        return characterRepository.findAll();
+    }
+
+    // Metodo para actualizar un personaje
+    public Character updateCharacter(UUID id, String name, CharacterClass characterClass, 
+            Integer level, Integer power, Integer armor, Integer life,
+            Integer strength, Integer intelligence, Integer willpower, Integer dexterity) {
+        
+        Optional<Character> existingCharacterOpt = characterRepository.findById(id);
+        if (existingCharacterOpt.isEmpty()) {
+            throw new IllegalArgumentException("Character with id " + id + " not found");
+        }
+
+        Character existingCharacter = existingCharacterOpt.get();
+        
+        // Update only provided fields
+        if (name != null && !name.isEmpty()) {
+            CharacterValidations.validateCharacterName(name);
+            if (!existingCharacter.getName().equals(name)) {
+                CharacterValidations.validateCharacterNameUnique(name, characterRepository);
+            }
+            existingCharacter.setName(name);
+        }
+        
+        if (characterClass != null) {
+            existingCharacter.setCharacterClass(characterClass);
+        }
+        
+        if (level != null) {
+            CharacterValidations.validateCharacterLevel(level);
+            existingCharacter.setLevel(level);
+        }
+        
+        if (power != null) {
+            existingCharacter.setPower(power);
+        }
+        
+        if (armor != null) {
+            existingCharacter.setArmor(armor);
+        }
+        
+        if (life != null) {
+            existingCharacter.setLife(life);
+        }
+        
+        // Update stats
+        Stats stats = existingCharacter.getStats();
+        if (strength != null) {
+            stats.setStrength(strength);
+        }
+        if (intelligence != null) {
+            stats.setIntelligence(intelligence);
+        }
+        if (willpower != null) {
+            stats.setWillpower(willpower);
+        }
+        if (dexterity != null) {
+            stats.setDexterity(dexterity);
+        }
+        
+        CharacterValidations.validateCharacterStats(stats);
+        existingCharacter.setStats(stats);
+        
+        return characterRepository.save(existingCharacter);
+    }
+
+    // Metodo para borrar un personaje
+    public boolean deleteCharacter(UUID id) {
+        Optional<Character> characterOpt = characterRepository.findById(id);
+        if (characterOpt.isEmpty()) {
+            return false;
+        }
+        characterRepository.deleteById(id);
+        return true;
+    }
 }
