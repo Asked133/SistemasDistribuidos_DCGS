@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  logconsumer:
+    build: .
+    container_name: log-consumer
+    environment:
+      - Kafka_BootstrapServers=kafka:9092
+    networks:
+      - trainerapi_trainers-network
+
+networks:
+  trainerapi_trainers-network:
+    external: true
